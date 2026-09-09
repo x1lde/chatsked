@@ -1,0 +1,133 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum BookingStatus {
+  CONFIRMED
+  COMPLETED
+  NO_SHOW
+  CANCELLED
+}
+
+enum BookingSource {
+  MESSENGER
+  SMS
+  MANUAL
+}
+
+enum ReminderKind {
+  H24
+  H2
+}
+
+enum ReminderChannel {
+  MESSENGER
+  SMS
+}
+
+enum ReminderStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model Owner {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  createdAt     DateTime  @default(now())
+  businesses    Business[]
+}
+
+model Business {
+  id               String    @id @default(cuid())
+  ownerId          String
+  owner            Owner     @relation(fields: [ownerId], references: [id])
+  name             String
+  location         String?
+  operatingHours   Json?     // e.g. { "mon": ["09:00","18:00"], ... }
+  fbPageId         String?
+  fbPageAccessToken String?  // store encrypted in production, see Phase 6 note
+  smsSenderId      String?
+  createdAt        DateTime  @default(now())
+
+  staff      Staff[]
+  services   Service[]
+  customers  Customer[]
+  bookings   Booking[]
+}
+
+model Staff {
+  id           String    @id @default(cuid())
+  businessId   String
+  business     Business  @relation(fields: [businessId], references: [id])
+  name         String
+  workingHours Json?
+  services     Service[] @relation("StaffServices")
+  bookings     Booking[]
+  createdAt    DateTime  @default(now())
+}
+
+model Service {
+  id          String    @id @default(cuid())
+  businessId  String
+  business    Business  @relation(fields: [businessId], references: [id])
+  name        String
+  durationMin Int
+  price       Decimal   @db.Decimal(10, 2)
+  staff       Staff[]   @relation("StaffServices")
+  bookings    Booking[]
+  createdAt   DateTime  @default(now())
+}
+
+model Customer {
+  id            String    @id @default(cuid())
+  businessId    String
+  business      Business  @relation(fields: [businessId], references: [id])
+  name          String
+  phone         String
+  noShowCount   Int       @default(0)
+  tags          String[]  @default([])
+  bookings      Booking[]
+  createdAt     DateTime  @default(now())
+
+  @@unique([businessId, phone])
+}
+
+model Booking {
+  id          String        @id @default(cuid())
+  businessId  String
+  business    Business      @relation(fields: [businessId], references: [id])
+  serviceId   String
+  service     Service       @relation(fields: [serviceId], references: [id])
+  staffId     String
+  staff       Staff         @relation(fields: [staffId], references: [id])
+  customerId  String
+  customer    Customer      @relation(fields: [customerId], references: [id])
+  startsAt    DateTime
+  endsAt      DateTime
+  status      BookingStatus @default(CONFIRMED)
+  source      BookingSource
+  createdAt   DateTime      @default(now())
+
+  reminders   Reminder[]
+
+  @@index([businessId, startsAt])
+  @@index([staffId, startsAt])
+}
+
+model Reminder {
+  id        String          @id @default(cuid())
+  bookingId String
+  booking   Booking         @relation(fields: [bookingId], references: [id])
+  kind      ReminderKind
+  channel   ReminderChannel
+  status    ReminderStatus  @default(PENDING)
+  sentAt    DateTime?
+  createdAt DateTime        @default(now())
+}
