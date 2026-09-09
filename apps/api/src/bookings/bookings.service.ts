@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { RemindersService } from '../reminders/reminders.service.js';
 
 @Injectable()
 export class BookingsService {
-    constructor(private prisma: PrismaService) {}
+    constructor(
+        private prisma: PrismaService,
+        private remindersService: RemindersService,
+    ) {}
 
     async getAvailableSlots(serviceId: string, staffId: string, date: string) {
         const service = await this.prisma.service.findUniqueOrThrow({ where: { id: serviceId } });
@@ -46,19 +50,19 @@ export class BookingsService {
         customerName: string;
         customerPhone: string;
         source: 'MESSENGER' | 'SMS' | 'MANUAL';
-    }) {
+        }) {
         const service = await this.prisma.service.findUniqueOrThrow({ where: { id: dto.serviceId } });
         const startsAt = new Date(dto.startsAt);
         const endsAt = new Date(startsAt.getTime() + service.durationMin * 60000);
 
         const customer = await this.prisma.customer.upsert({
-        where: { businessId_phone: { businessId, phone: dto.customerPhone } },
-        update: { name: dto.customerName },
-        create: { businessId, name: dto.customerName, phone: dto.customerPhone },
+            where: { businessId_phone: { businessId, phone: dto.customerPhone } },
+            update: { name: dto.customerName },
+            create: { businessId, name: dto.customerName, phone: dto.customerPhone },
         });
 
-        return this.prisma.booking.create({
-        data: {
+        const booking = await this.prisma.booking.create({
+            data: {
             businessId,
             serviceId: dto.serviceId,
             staffId: dto.staffId,
@@ -66,8 +70,13 @@ export class BookingsService {
             startsAt,
             endsAt,
             source: dto.source,
-        },
+            },
         });
+
+        const testTime = new Date(Date.now() + 30 * 1000); // 30 seconds from now
+        await this.remindersService.schedule(booking.id, 'H2', testTime);
+
+        return booking;
     }
 
     updateStatus(id: string, status: 'COMPLETED' | 'NO_SHOW' | 'CANCELLED') {

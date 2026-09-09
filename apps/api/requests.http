@@ -81,3 +81,16 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR1azB2b
 
 ###
 GET http://localhost:3000/webhooks/messenger?hub.mode=subscribe&hub.verify_token=chatsked_verify_123&hub.challenge=test12345
+
+###
+POST http://localhost:3000/public/bookings
+Content-Type: application/json
+
+{
+    "businessId": "cmtul68qr00014q52oi2itcsw",
+    "serviceId": "cmtumizs800034q3drfjmuvnv",
+    "staffId": "cmtumgctt00014q3dmbmikb4j",
+    "startsAt": "2026-09-16T09:00:00",
+    "customerName": "Reminder Test",
+    "customerPhone": "09191234567"
+}
