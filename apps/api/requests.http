@@ -15,3 +15,39 @@ Content-Type: application/json
     "email": "test@example.com",
     "password": "somepassword123"
 }
+
+###
+POST http://localhost:3000/services
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR1azB2bm4wMDAwNHEyOGIxbDA1aHV2IiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzg4OTg3NDcyLCJleHAiOjE3ODk1OTIyNzJ9.Cqr-VZ2aO6kzxw9D-Nx3oPNjdlSJSkP54v9t1Nilk8M
+
+{
+    "businessId": "cmtul68qr00014q52oi2itcsw",
+    "name": "Haircut",
+    "durationMin": 30,
+    "price": 250
+}
+
+###
+POST http://localhost:3000/businesses
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR1azB2bm4wMDAwNHEyOGIxbDA1aHV2IiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzg4OTg3ODI5LCJleHAiOjE3ODk1OTI2Mjl9.2wY8X9vvWsP8pNn-BhNUQOB1VxBnA2lvqG8UEpFgidI
+
+{
+    "name": "Miel's Barbershop",
+    "location": "Sto. Tomas, Batangas"
+}
+
+###
+POST http://localhost:3000/staff
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR1azB2bm4wMDAwNHEyOGIxbDA1aHV2IiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzg4OTg3ODI5LCJleHAiOjE3ODk1OTI2Mjl9.2wY8X9vvWsP8pNn-BhNUQOB1VxBnA2lvqG8UEpFgidI
+
+{
+    "businessId": "cmtul68qr00014q52oi2itcsw",
+    "name": "Juan Dela Cruz"
+}
+
+###
+GET http://localhost:3000/customers?businessId=<your real business id>
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR1azB2bm4wMDAwNHEyOGIxbDA1aHV2IiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzg4OTg3ODI5LCJleHAiOjE3ODk1OTI2Mjl9.2wY8X9vvWsP8pNn-BhNUQOB1VxBnA2lvqG8UEpFgidI
