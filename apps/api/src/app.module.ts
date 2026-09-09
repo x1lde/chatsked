@@ -10,6 +10,7 @@ import { ServicesModule } from './services/services.module.js';
 import { CustomersModule } from './customers/customers.module.js';
 import { BookingsModule } from './bookings/bookings.module.js';
 import { RemindersModule } from './reminders/reminders.module.js';
+import { MessengerModule } from './webhooks/messenger.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -30,6 +31,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     CustomersModule,
     BookingsModule,
     RemindersModule,
+    MessengerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

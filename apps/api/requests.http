@@ -78,3 +78,6 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR1azB2bm4wMDAwNHEyOGIxbDA1aHV2IiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzg4OTg3ODI5LCJleHAiOjE3ODk1OTI2Mjl9.2wY8X9vvWsP8pNn-BhNUQOB1VxBnA2lvqG8UEpFgidI
 
 { "status": "NO_SHOW" }
+
+###
+GET http://localhost:3000/webhooks/messenger?hub.mode=subscribe&hub.verify_token=chatsked_verify_123&hub.challenge=test12345
