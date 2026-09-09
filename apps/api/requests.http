@@ -29,6 +29,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR1azB2b
 }
 
 ###
+GET http://localhost:3000/services?businessId=cmtul68qr00014q52oi2itcsw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR1azB2bm4wMDAwNHEyOGIxbDA1aHV2IiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzg4OTg3NDcyLCJleHAiOjE3ODk1OTIyNzJ9.Cqr-VZ2aO6kzxw9D-Nx3oPNjdlSJSkP54v9t1Nilk8M
+
+###
 POST http://localhost:3000/businesses
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR1azB2bm4wMDAwNHEyOGIxbDA1aHV2IiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzg4OTg3ODI5LCJleHAiOjE3ODk1OTI2Mjl9.2wY8X9vvWsP8pNn-BhNUQOB1VxBnA2lvqG8UEpFgidI
@@ -49,5 +53,28 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR1azB2b
 }
 
 ###
-GET http://localhost:3000/customers?businessId=<your real business id>
+GET http://localhost:3000/customers?businessId=cmtul68qr00014q52oi2itcsw
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR1azB2bm4wMDAwNHEyOGIxbDA1aHV2IiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzg4OTg3ODI5LCJleHAiOjE3ODk1OTI2Mjl9.2wY8X9vvWsP8pNn-BhNUQOB1VxBnA2lvqG8UEpFgidI
+
+###
+GET http://localhost:3000/public/availability?serviceId=cmtul81sd00034q52u95b8zda&staffId=cmtumgctt00014q3dmbmikb4j&date=2026-09-15
+
+###
+POST http://localhost:3000/public/bookings
+Content-Type: application/json
+
+{
+    "businessId": "cmtul68qr00014q52oi2itcsw",
+    "serviceId": "cmtul81sd00034q52u95b8zda",
+    "staffId": "cmtumgctt00014q3dmbmikb4j",
+    "startsAt": "2026-09-15T09:00:00",
+    "customerName": "Test Customer",
+    "customerPhone": "09171234567"
+}
+
+###
+PATCH http://localhost:3000/bookings/cmtumop1t00074q3dvadchrbi/status
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR1azB2bm4wMDAwNHEyOGIxbDA1aHV2IiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzg4OTg3ODI5LCJleHAiOjE3ODk1OTI2Mjl9.2wY8X9vvWsP8pNn-BhNUQOB1VxBnA2lvqG8UEpFgidI
+
+{ "status": "NO_SHOW" }
