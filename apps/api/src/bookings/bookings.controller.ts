@@ -28,6 +28,12 @@ export class BookingsController {
     }
 
     @UseGuards(JwtAuthGuard)
+    @Get('bookings')
+    findToday(@Query('businessId') businessId: string) {
+    return this.bookingsService.findTodayForBusiness(businessId);
+    }
+
+    @UseGuards(JwtAuthGuard)
     @Post('bookings/manual')
     createManualBooking(@Body() dto: {
         businessId: string;

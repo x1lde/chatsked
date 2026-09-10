@@ -80,6 +80,23 @@ export class BookingsService {
         return booking;
     }
 
+    async findTodayForBusiness(businessId: string) {
+    const dayStart = new Date();
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date();
+    dayEnd.setHours(23, 59, 59, 999);
+
+    return this.prisma.booking.findMany({
+        where: {
+        businessId,
+        startsAt: { gte: dayStart, lte: dayEnd },
+        status: { not: 'CANCELLED' },
+        },
+        include: { service: true, staff: true, customer: true },
+        orderBy: { startsAt: 'asc' },
+    });
+    }
+
     updateStatus(id: string, status: 'COMPLETED' | 'NO_SHOW' | 'CANCELLED') {
         return this.prisma.$transaction(async (tx) => {
         const booking = await tx.booking.update({ where: { id }, data: { status } });

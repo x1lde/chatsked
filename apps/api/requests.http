@@ -94,3 +94,37 @@ Content-Type: application/json
     "customerName": "Reminder Test",
     "customerPhone": "09191234567"
 }
+
+###
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+    "email": "test1@example.com",
+    "password": "12345678"
+}
+
+###
+GET http://localhost:3000/businesses
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR3M214ZDUwMDAwNHF1bGk3b3VxYXliIiwiZW1haWwiOiJ0ZXN0MUBleGFtcGxlLmNvbSIsImlhdCI6MTc4OTA3OTM1MSwiZXhwIjoxNzg5Njg0MTUxfQ.fl0wLk3GFQA1nzFY4DKczFHrNpP85sDBtz_3UVoyLdk
+
+###
+GET http://localhost:3000/services?businessId=cmtw3n2dg00024quljnaod8is
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR3M214ZDUwMDAwNHF1bGk3b3VxYXliIiwiZW1haWwiOiJ0ZXN0MUBleGFtcGxlLmNvbSIsImlhdCI6MTc4OTA3OTM1MSwiZXhwIjoxNzg5Njg0MTUxfQ.fl0wLk3GFQA1nzFY4DKczFHrNpP85sDBtz_3UVoyLdk
+
+###
+GET http://localhost:3000/staff?businessId=cmtw3n2dg00024quljnaod8is
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR3M214ZDUwMDAwNHF1bGk3b3VxYXliIiwiZW1haWwiOiJ0ZXN0MUBleGFtcGxlLmNvbSIsImlhdCI6MTc4OTA3OTM1MSwiZXhwIjoxNzg5Njg0MTUxfQ.fl0wLk3GFQA1nzFY4DKczFHrNpP85sDBtz_3UVoyLdk
+
+###
+POST http://localhost:3000/public/bookings
+Content-Type: application/json
+
+    {
+    "businessId": "cmtw3n2dg00024quljnaod8is",
+    "serviceId": "cmtw3oxug00044qulf6871me2",
+    "staffId": "cmtw3p4nq00064qul5sjwh6pc",
+    "startsAt": "2026-09-11T14:00:00",
+    "customerName": "Frontend Test Customer",
+    "customerPhone": "09171112222"
+}
