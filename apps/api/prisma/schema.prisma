@@ -91,6 +91,7 @@ model Customer {
   business      Business  @relation(fields: [businessId], references: [id])
   name          String
   phone         String
+  messengerPsid String?
   noShowCount   Int       @default(0)
   tags          String[]  @default([])
   bookings      Booking[]

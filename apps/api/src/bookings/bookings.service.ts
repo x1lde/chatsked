@@ -49,6 +49,7 @@ export class BookingsService {
         startsAt: string;
         customerName: string;
         customerPhone: string;
+        messengerPsid?: string;
         source: 'MESSENGER' | 'SMS' | 'MANUAL';
         }) {
         const service = await this.prisma.service.findUniqueOrThrow({ where: { id: dto.serviceId } });
@@ -57,8 +58,8 @@ export class BookingsService {
 
         const customer = await this.prisma.customer.upsert({
             where: { businessId_phone: { businessId, phone: dto.customerPhone } },
-            update: { name: dto.customerName },
-            create: { businessId, name: dto.customerName, phone: dto.customerPhone },
+            update: { name: dto.customerName, ...(dto.messengerPsid && { messengerPsid: dto.messengerPsid }) },
+            create: { businessId, name: dto.customerName, phone: dto.customerPhone, messengerPsid: dto.messengerPsid },
         });
 
         const booking = await this.prisma.booking.create({

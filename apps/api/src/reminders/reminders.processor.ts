@@ -2,14 +2,12 @@ import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { MessengerService } from '../webhooks/messenger.service.js';
-import { SmsService } from '../sms/sms.service.js';
 
 @Processor('reminders')
 export class RemindersProcessor extends WorkerHost {
     constructor(
         private prisma: PrismaService,
         private messenger: MessengerService,
-        private sms: SmsService,
     ) {
         super();
     }
@@ -21,12 +19,22 @@ export class RemindersProcessor extends WorkerHost {
         });
 
         const text = this.buildMessage(reminder);
+        const psid = reminder.booking.customer.messengerPsid;
 
-        try {
-        await this.sms.send(reminder.booking.customer.phone, text);
+        if (!psid) {
         await this.prisma.reminder.update({
             where: { id: reminder.id },
-            data: { status: 'SENT', sentAt: new Date(), channel: 'SMS' },
+            data: { status: 'FAILED' },
+        });
+        console.warn(`No messengerPsid for customer ${reminder.booking.customer.id}, skipping reminder`);
+        return;
+        }
+
+        try {
+        await this.messenger.sendText(psid, text);
+        await this.prisma.reminder.update({
+            where: { id: reminder.id },
+            data: { status: 'SENT', sentAt: new Date(), channel: 'MESSENGER' },
         });
         } catch (err) {
         await this.prisma.reminder.update({
