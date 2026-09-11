@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { BookingsService } from './bookings.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 
@@ -29,14 +29,14 @@ export class BookingsController {
 
     @UseGuards(JwtAuthGuard)
     @Get('bookings')
-    findToday(@Query('businessId') businessId: string) {
-        return this.bookingsService.findTodayForBusiness(businessId);
+    findToday(@Query('businessId') businessId: string, @Req() req: any) {
+        return this.bookingsService.findTodayForBusiness(req.user.sub, businessId);
     }
 
     @UseGuards(JwtAuthGuard)
     @Get('bookings/all')
-    findAll(@Query('businessId') businessId: string) {
-        return this.bookingsService.findAllForBusiness(businessId);
+    findAll(@Query('businessId') businessId: string, @Req() req: any) {
+        return this.bookingsService.findAllForBusiness(req.user.sub, businessId);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -48,13 +48,13 @@ export class BookingsController {
         startsAt: string;
         customerName: string;
         customerPhone: string;
-    }) {
-        return this.bookingsService.createBooking(dto.businessId, { ...dto, source: 'MANUAL' });
+    }, @Req() req: any) {
+        return this.bookingsService.createBooking(dto.businessId, { ...dto, source: 'MANUAL' }, req.user.sub);
     }
 
     @UseGuards(JwtAuthGuard)
     @Patch('bookings/:id/status')
-    updateStatus(@Param('id') id: string, @Body() dto: { status: 'COMPLETED' | 'NO_SHOW' | 'CANCELLED' }) {
-        return this.bookingsService.updateStatus(id, dto.status);
+    updateStatus(@Param('id') id: string, @Body() dto: { status: 'COMPLETED' | 'NO_SHOW' | 'CANCELLED' }, @Req() req: any) {
+        return this.bookingsService.updateStatus(req.user.sub, id, dto.status);
     }
 }

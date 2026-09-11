@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { RemindersService } from '../reminders/reminders.service.js';
+import { BusinessAccessService } from '../common/business-access.service.js';
 
 @Injectable()
 export class BookingsService {
     constructor(
         private prisma: PrismaService,
         private remindersService: RemindersService,
+        private businessAccess: BusinessAccessService,
     ) {}
 
     async getAvailableSlots(serviceId: string, staffId: string, date: string) {
@@ -51,7 +53,12 @@ export class BookingsService {
         customerPhone: string;
         messengerPsid?: string;
         source: 'MESSENGER' | 'SMS' | 'MANUAL';
-    }) {
+    }, ownerId?: string) {
+        // ownerId is only present for the authenticated "manual booking" path.
+        // The public booking flow is intentionally unauthenticated.
+        if (ownerId) {
+            await this.businessAccess.assertOwnsBusiness(ownerId, businessId);
+        }
         const service = await this.prisma.service.findUniqueOrThrow({ where: { id: dto.serviceId } });
         const startsAt = new Date(dto.startsAt);
         const endsAt = new Date(startsAt.getTime() + service.durationMin * 60000);
@@ -84,7 +91,8 @@ export class BookingsService {
         return booking;
     }
 
-    async findTodayForBusiness(businessId: string) {
+    async findTodayForBusiness(ownerId: string, businessId: string) {
+        await this.businessAccess.assertOwnsBusiness(ownerId, businessId);
         const dayStart = new Date();
         dayStart.setHours(0, 0, 0, 0);
         const dayEnd = new Date();
@@ -101,7 +109,8 @@ export class BookingsService {
         });
     }
 
-    findAllForBusiness(businessId: string) {
+    async findAllForBusiness(ownerId: string, businessId: string) {
+        await this.businessAccess.assertOwnsBusiness(ownerId, businessId);
         return this.prisma.booking.findMany({
         where: {
             businessId,
@@ -112,7 +121,8 @@ export class BookingsService {
         });
     }
 
-    updateStatus(id: string, status: 'COMPLETED' | 'NO_SHOW' | 'CANCELLED') {
+    async updateStatus(ownerId: string, id: string, status: 'COMPLETED' | 'NO_SHOW' | 'CANCELLED') {
+        await this.businessAccess.assertOwnsBooking(ownerId, id);
         return this.prisma.$transaction(async (tx) => {
         const booking = await tx.booking.update({ where: { id }, data: { status } });
         if (status === 'NO_SHOW') {
