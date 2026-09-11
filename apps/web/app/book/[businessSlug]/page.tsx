@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import { PageLoader } from '../../../components/PageLoader';
+import { Spinner } from '../../../components/Spinner';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000';
 
@@ -26,6 +28,7 @@ export default function PublicBookingPage() {
     const [customerPhone, setCustomerPhone] = useState('');
     const [confirmed, setConfirmed] = useState(false);
     const [error, setError] = useState('');
+    const [submitting, setSubmitting] = useState(false);
     
     // Load business + services + staff on page load
     useEffect(() => {
@@ -58,28 +61,32 @@ export default function PublicBookingPage() {
     async function handleBook(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!business || !selectedService || !selectedStaff || !selectedSlot) return;
+        setSubmitting(true);
         try {
-        const res = await fetch(`${API_URL}/public/bookings`, {
+            const res = await fetch(`${API_URL}/public/bookings`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-            businessId: business.id,
-            serviceId: selectedService.id,
-            staffId: selectedStaff.id,
-            startsAt: selectedSlot.start,
-            customerName,
-            customerPhone,
+                businessId: business.id,
+                serviceId: selectedService.id,
+                staffId: selectedStaff.id,
+                startsAt: selectedSlot.start,
+                customerName,
+                customerPhone,
             }),
-        });
-        if (!res.ok) throw new Error('Booking failed');
-        setConfirmed(true);
+            });
+            if (!res.ok) throw new Error('Booking failed');
+            setConfirmed(true);
         } catch {
-        setError('Could not complete the booking. Please try again.');
+            setError('Could not complete the booking. Please try again.');
+            setTimeout(() => setError(''), 4000);
+        } finally {
+            setSubmitting(false);
         }
     }
 
     if (error) return <p className="p-6 text-red-600">{error}</p>;
-    if (!business) return <p className="p-6 text-charcoal/50">Loading...</p>;
+    if (!business) return <PageLoader />;
 
     if (confirmed) {
     return (
@@ -194,8 +201,12 @@ export default function PublicBookingPage() {
                 className="w-full rounded-xl border border-transparent bg-white/60 px-3 py-2 outline-none"
                 required
             />
-            <button type="submit" className="w-full rounded-xl bg-terracotta py-3 font-semibold text-white hover:bg-terracotta-dark">
-                Confirm booking
+            <button
+            type="submit"
+            disabled={submitting}
+            className="w-full rounded-xl bg-terracotta py-3 font-semibold text-white hover:bg-terracotta-dark disabled:opacity-60 flex items-center justify-center gap-2"
+            >
+            {submitting ? <Spinner size={18} /> : 'Confirm booking'}
             </button>
             </form>
         )}

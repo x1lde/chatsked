@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { apiFetch } from '../../../lib/api';
+import { useToast } from '../../../lib/toast';
+import { Spinner } from '../../../components/Spinner';
 
 type Service = {
     id: string;
@@ -11,16 +13,14 @@ type Service = {
 };
 
 export default function ServicesPage() {
+    const { showToast } = useToast();
     const [services, setServices] = useState<Service[]>([]);
     const [businessId, setBusinessId] = useState('');
     const [name, setName] = useState('');
     const [durationMin, setDurationMin] = useState('30');
     const [price, setPrice] = useState('');
-    const [error, setError] = useState('');
-
-    useEffect(() => {
-        document.title = 'Services — ChatSked';
-    }, []);
+    const [needsBusiness, setNeedsBusiness] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
 
     async function loadServices(biz: string) {
         const data = await apiFetch(`/services?businessId=${biz}`);
@@ -32,7 +32,7 @@ export default function ServicesPage() {
         try {
             const businesses = await apiFetch('/businesses');
             if (businesses.length === 0) {
-            setError('Create a business first from the dashboard home page.');
+            setNeedsBusiness(true);
             return;
             }
             const biz = businesses[0].id;
@@ -40,14 +40,15 @@ export default function ServicesPage() {
             await loadServices(biz);
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Failed to load services';
-            setError(message);
+            showToast(message, 'error');
         }
         }
         load();
-    }, []);
+    }, [showToast]);
 
     async function handleCreate(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
+        setSubmitting(true);
         try {
         await apiFetch('/services', {
             method: 'POST',
@@ -60,62 +61,71 @@ export default function ServicesPage() {
         });
         setName('');
         setPrice('');
+        showToast('Service added!');
         await loadServices(businessId);
         } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to create service';
-        setError(message);
+        showToast(message, 'error');
+        } finally {
+        setSubmitting(false);
         }
     }
 
-    if (error) return <p className="text-red-600">{error}</p>;
+    if (needsBusiness) {
+        return <p className="text-charcoal/60">Create a business first from the dashboard home page.</p>;
+    }
 
     return (
-    <div className="max-w-lg space-y-6">
+        <div className="max-w-lg space-y-6">
         <h1 className="text-2xl font-bold tracking-tight">Services</h1>
 
         <form onSubmit={handleCreate} className="glass space-y-3 rounded-2xl p-5">
-        <input
+            <input
             type="text"
             placeholder="Service name (e.g. Gel Manicure)"
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="glass w-full rounded-xl px-3 py-2 outline-none"
             required
-        />
-        <div className="flex gap-3">
+            />
+            <div className="flex gap-3">
             <input
-            type="number"
-            placeholder="Duration (min)"
-            value={durationMin}
-            onChange={(e) => setDurationMin(e.target.value)}
-            className="glass w-1/2 rounded-xl px-3 py-2 outline-none"
-            required
+                type="number"
+                placeholder="Duration (min)"
+                value={durationMin}
+                onChange={(e) => setDurationMin(e.target.value)}
+                className="glass w-1/2 rounded-xl px-3 py-2 outline-none"
+                required
             />
             <input
-            type="number"
-            placeholder="Price (₱)"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            className="glass w-1/2 rounded-xl px-3 py-2 outline-none"
-            required
+                type="number"
+                placeholder="Price (₱)"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                className="glass w-1/2 rounded-xl px-3 py-2 outline-none"
+                required
             />
-        </div>
-        <button type="submit" className="w-full rounded-xl bg-terracotta py-2 font-semibold text-white hover:bg-terracotta-dark">
-            Add service
-        </button>
+            </div>
+            <button
+            type="submit"
+            disabled={submitting}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-terracotta py-2 font-semibold text-white hover:bg-terracotta-dark disabled:opacity-60"
+            >
+            {submitting ? <Spinner size={16} /> : 'Add service'}
+            </button>
         </form>
 
         <ul className="space-y-2">
-        {services.map((s) => (
+            {services.map((s) => (
             <li key={s.id} className="glass flex items-center justify-between rounded-2xl p-4">
-            <div>
+                <div>
                 <p className="font-semibold">{s.name}</p>
                 <p className="text-sm text-charcoal/50">{s.durationMin} min</p>
-            </div>
-            <span className="rounded-full bg-sage/20 px-3 py-1 text-sm font-semibold text-sage">₱{s.price}</span>
+                </div>
+                <span className="rounded-full bg-sage/20 px-3 py-1 text-sm font-semibold text-sage">₱{s.price}</span>
             </li>
-        ))}
+            ))}
         </ul>
-    </div>
+        </div>
     );
 }

@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 @theme {
-  --color-cream: #FAF6F0;
-  --color-sand: #F0E6D6;
-  --color-charcoal: #2B2622;
-  --color-terracotta: #C96F4A;
-  --color-terracotta-dark: #A85736;
-  --color-sage: #6B8F71;
-  --color-amber: #E0A458;
+  --color-cream: #FDFBE8;
+  --color-sand: #FBF4C4;
+  --color-charcoal: #582630;
+  --color-terracotta: #F26157;
+  --color-terracotta-dark: #A54657;
+  --color-sage: #5E8B7E;
+  --color-amber: #F1A66A;
 }
 
 body {
-  background: linear-gradient(180deg, #FAF6F0 0%, #F3ECE1 100%);
+  background: linear-gradient(180deg, #FDFBE8 0%, #FBF4C4 100%);
   min-height: 100vh;
 }
 
@@ -22,8 +22,4 @@ body {
   .glass-strong {
     @apply bg-white/80 backdrop-blur-2xl border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.08)];
   }
-}
-
-html, body {
-  overflow-x: hidden;
 }

@@ -100,9 +100,12 @@ export default function CalendarPage() {
                     {new Date(b.startsAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </p>
                     <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                    b.status === 'CONFIRMED' ? 'bg-sage/20 text-sage' : 'bg-amber/20 text-amber'
-                    }`}>
-                    {b.status}
+                        b.status === 'COMPLETED' ? 'bg-sage/20 text-sage' :
+                        b.status === 'CONFIRMED' ? 'bg-amber/20 text-amber' :
+                        b.status === 'NO_SHOW' ? 'bg-amber/20 text-amber' :
+                        'bg-charcoal/10 text-charcoal/50'
+                        }`}>
+                        {b.status}
                     </span>
                 </div>
                 <p className="mt-1 font-medium">{b.customer.name}</p>
