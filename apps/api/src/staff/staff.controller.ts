@@ -2,30 +2,38 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } f
 import { StaffService } from './staff.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 
-@UseGuards(JwtAuthGuard)
-@Controller('staff')
+@Controller()
 export class StaffController {
     constructor(private staffService: StaffService) {}
 
-    @Post()
-    create(@Body() dto: { businessId: string; name: string; workingHours?: string }) {
+    @UseGuards(JwtAuthGuard)
+    @Post('staff')
+    create(@Body() dto: { businessId: string; name: string; workingHours?: any }) {
         return this.staffService.create(dto.businessId, {
-            name: dto.name,
-            workingHours: dto.workingHours,
+        name: dto.name,
+        workingHours: dto.workingHours,
         });
     }
 
-    @Get()
+    @UseGuards(JwtAuthGuard)
+    @Get('staff')
     findAll(@Query('businessId') businessId: string) {
         return this.staffService.findAllForBusiness(businessId);
     }
 
-    @Patch(':id')
-    update(@Param('id') id: string, @Body() dto: Partial<{ name: string; workingHours?: string }>) {
+    @Get('public/staff')
+    findAllPublic(@Query('businessId') businessId: string) {
+        return this.staffService.findAllForBusiness(businessId);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Patch('staff/:id')
+    update(@Param('id') id: string, @Body() dto: Partial<{ name: string; workingHours?: any }>) {
         return this.staffService.update(id, dto);
     }
 
-    @Delete(':id')
+    @UseGuards(JwtAuthGuard)
+    @Delete('staff/:id')
     remove(@Param('id') id: string) {
         return this.staffService.remove(id);
     }

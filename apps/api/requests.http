@@ -100,8 +100,8 @@ POST http://localhost:3000/auth/login
 Content-Type: application/json
 
 {
-    "email": "test1@example.com",
-    "password": "12345678"
+    "email": "test@example.com",
+    "password": "3288"
 }
 
 ###
@@ -128,3 +128,13 @@ Content-Type: application/json
     "customerName": "Frontend Test Customer",
     "customerPhone": "09171112222"
 }
+
+###
+GET http://localhost:3000/businesses/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR3YjY3enowMDAwNHFucG9sMG9jbDJiIiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzg5MDkyMDk4LCJleHAiOjE3ODk2OTY4OTh9.doQyAJJ7HKhEyj9BaUDjNKdG1f8awrmifS02lwzlqz0
+
+###
+GET http://localhost:3000/public/businesses/test-barbershop
+
+###
+GET http://localhost:3000/public/staff?businessId=cmtwb6kqc00024qnpm3ku1hui

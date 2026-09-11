@@ -49,6 +49,7 @@ model Business {
   ownerId          String
   owner            Owner     @relation(fields: [ownerId], references: [id])
   name             String
+  slug             String    @unique
   location         String?
   operatingHours   Json?     // e.g. { "mon": ["09:00","18:00"], ... }
   fbPageId         String?

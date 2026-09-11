@@ -1,19 +1,25 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { BusinessesService } from './businesses.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 
-@UseGuards(JwtAuthGuard)
-@Controller('businesses')
+@Controller()
 export class BusinessesController {
     constructor(private businessesService: BusinessesService) {}
 
-    @Post()
+    @UseGuards(JwtAuthGuard)
+    @Post('businesses')
     create(@Body() dto: { name: string; location?: string }, @Req() req: any) {
         return this.businessesService.create(req.user.sub, dto);
     }
 
-    @Get()
+    @UseGuards(JwtAuthGuard)
+    @Get('businesses')
     findAll(@Req() req: any) {
         return this.businessesService.findAllForOwner(req.user.sub);
+    }
+
+    @Get('public/businesses/:slug')
+    findBySlug(@Param('slug') slug: string) {
+        return this.businessesService.findBySlug(slug);
     }
 }
