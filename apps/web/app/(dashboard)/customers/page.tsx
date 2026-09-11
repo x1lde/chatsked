@@ -15,6 +15,10 @@ export default function CustomersPage() {
     const [error, setError] = useState('');
 
     useEffect(() => {
+        document.title = 'Customers — ChatSked';
+    }, []);
+
+    useEffect(() => {
         async function load() {
         try {
             const businesses = await apiFetch('/businesses');

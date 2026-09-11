@@ -26,7 +26,7 @@ export default function PublicBookingPage() {
     const [customerPhone, setCustomerPhone] = useState('');
     const [confirmed, setConfirmed] = useState(false);
     const [error, setError] = useState('');
-
+    
     // Load business + services + staff on page load
     useEffect(() => {
         async function load() {

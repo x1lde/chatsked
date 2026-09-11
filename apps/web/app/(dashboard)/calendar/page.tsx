@@ -22,11 +22,15 @@ function getWeekDates(center: Date) {
     return days;
     }
 
-    export default function CalendarPage() {
+export default function CalendarPage() {
     const [businessId, setBusinessId] = useState('');
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        document.title = 'Calendar — ChatSked';
+    }, []);
 
     useEffect(() => {
         async function init() {

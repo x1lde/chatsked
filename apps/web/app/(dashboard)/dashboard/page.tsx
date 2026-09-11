@@ -10,14 +10,18 @@ type Booking = {
     service: { name: string };
     staff: { name: string };
     customer: { name: string; phone: string };
-    };
+};
 
-    export default function DashboardHomePage() {
+export default function DashboardHomePage() {
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [businessId, setBusinessId] = useState<string | null>(null);
     const [needsBusiness, setNeedsBusiness] = useState(false);
     const [businessName, setBusinessName] = useState('');
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        document.title = 'Dashboard — ChatSked';
+    }, []);
 
     async function loadBookings(biz: string) {
         const todaysBookings = await apiFetch(`/bookings?businessId=${biz}`);

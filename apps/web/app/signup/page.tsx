@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiFetch } from '../../lib/api';
 
@@ -10,6 +10,10 @@ export default function SignupPage() {
     const [error, setError] = useState('');
     const router = useRouter();
 
+    useEffect(() => {
+        document.title = 'Sign up — ChatSked';
+    }, []);
+    
     async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
         setError('');

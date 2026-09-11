@@ -14,6 +14,10 @@ export default function StaffPage() {
     const [name, setName] = useState('');
     const [error, setError] = useState('');
 
+    useEffect(() => {
+        document.title = 'Staff — ChatSked';
+    }, []);
+
     async function loadStaff(biz: string) {
         const data = await apiFetch(`/staff?businessId=${biz}`);
         setStaff(data);

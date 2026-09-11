@@ -18,6 +18,10 @@ export default function ServicesPage() {
     const [price, setPrice] = useState('');
     const [error, setError] = useState('');
 
+    useEffect(() => {
+        document.title = 'Services — ChatSked';
+    }, []);
+
     async function loadServices(biz: string) {
         const data = await apiFetch(`/services?businessId=${biz}`);
         setServices(data);

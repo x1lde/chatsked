@@ -1,3 +1,5 @@
+'use client';
+import { useState } from 'react';
 import Link from "next/link";
 
 const demoBookings = [
@@ -7,20 +9,26 @@ const demoBookings = [
     ];
 
     export default function LandingPage() {
-    return (
+        const [menuOpen, setMenuOpen] = useState(false);
+        return (
         <div className="min-h-screen overflow-x-hidden">
         <header className="sticky top-0 z-50 px-4 py-3 sm:px-8">
             <div className="glass-strong mx-auto flex max-w-6xl items-center justify-between rounded-2xl px-5 py-3">
-            <span className="text-lg font-bold tracking-tight">ChatSked</span>
-            <div className="flex items-center gap-3">
-                <Link href="/login" className="hidden text-sm font-medium text-charcoal/70 hover:text-charcoal sm:block">
-                Log in
-                </Link>
-                <Link href="/signup" className="rounded-full bg-terracotta px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-terracotta-dark">
-                Get Started
-                </Link>
+            <Link href="/" className="text-lg font-bold tracking-tight">ChatSked</Link>
+            <div className="hidden items-center gap-3 sm:flex">
+                <Link href="/login" className="text-sm font-medium text-charcoal/70 hover:text-charcoal">Log in</Link>
+                <Link href="/signup" className="rounded-full bg-terracotta px-4 py-2 text-sm font-semibold text-white hover:bg-terracotta-dark">Get Started</Link>
             </div>
+            <button onClick={() => setMenuOpen(!menuOpen)} className="sm:hidden text-2xl">
+                {menuOpen ? '✕' : '☰'}
+            </button>
             </div>
+            {menuOpen && (
+            <div className="glass-strong mx-auto mt-2 max-w-6xl rounded-2xl p-4 sm:hidden">
+                <Link href="/login" className="block py-2 text-center font-medium">Log in</Link>
+                <Link href="/signup" className="mt-2 block rounded-full bg-terracotta py-2 text-center font-semibold text-white">Get Started</Link>
+            </div>
+            )}
         </header>
 
         <section className="px-4 pb-16 pt-10 sm:px-8 sm:pt-16">
@@ -152,8 +160,15 @@ const demoBookings = [
             </div>
         </section>
 
-        <footer className="px-4 pb-8 text-center text-sm text-charcoal/40 sm:px-8">
-            © 2026 ChatSked · Made for Philippine local businesses
+        <footer className="px-4 pb-8 sm:px-8">
+        <div className="mx-auto max-w-6xl flex flex-col items-center gap-3 text-sm text-charcoal/50 sm:flex-row sm:justify-between">
+            <span>© {new Date().getFullYear()} ChatSked · Made for Philippine local businesses</span>
+            <div className="flex gap-4">
+            <Link href="/login" className="hover:text-charcoal">Log in</Link>
+            <Link href="/signup" className="hover:text-charcoal">Sign up</Link>
+            <a href="#features" className="hover:text-charcoal">Features</a>
+            </div>
+        </div>
         </footer>
         </div>
     );
