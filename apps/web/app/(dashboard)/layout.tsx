@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
+/*fix for commit message*/
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     const router = useRouter();
 
