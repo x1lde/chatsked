@@ -56,30 +56,33 @@ export default function StaffPage() {
     if (error) return <p className="text-red-600">{error}</p>;
 
     return (
-        <div className="max-w-lg space-y-6">
-        <h1 className="text-xl font-semibold">Staff</h1>
+    <div className="max-w-lg space-y-6">
+        <h1 className="text-2xl font-bold tracking-tight">Staff</h1>
 
-        <form onSubmit={handleCreate} className="space-y-3 rounded border p-4">
-            <input
+        <form onSubmit={handleCreate} className="glass space-y-3 rounded-2xl p-5">
+        <input
             type="text"
             placeholder="Staff name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full rounded border px-3 py-2"
+            className="glass w-full rounded-xl px-3 py-2 outline-none"
             required
-            />
-            <button type="submit" className="rounded bg-black px-4 py-2 text-white">
+        />
+        <button type="submit" className="w-full rounded-xl bg-terracotta py-2 font-semibold text-white hover:bg-terracotta-dark">
             Add staff member
-            </button>
+        </button>
         </form>
 
         <ul className="space-y-2">
-            {staff.map((s) => (
-            <li key={s.id} className="rounded border p-3">
-                {s.name}
+        {staff.map((s) => (
+            <li key={s.id} className="glass flex items-center gap-3 rounded-2xl p-4">
+            <div className="glass-strong flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold">
+                {s.name.charAt(0)}
+            </div>
+            <p className="font-medium">{s.name}</p>
             </li>
-            ))}
+        ))}
         </ul>
-        </div>
+    </div>
     );
 }

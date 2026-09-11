@@ -79,51 +79,60 @@ export default function PublicBookingPage() {
     }
 
     if (error) return <p className="p-6 text-red-600">{error}</p>;
-    if (!business) return <p className="p-6">Loading...</p>;
+    if (!business) return <p className="p-6 text-charcoal/50">Loading...</p>;
 
     if (confirmed) {
-        return (
-        <div className="mx-auto max-w-sm p-6 text-center">
-            <h1 className="text-xl font-semibold text-green-700">You&apos;re booked!</h1>
-            <p className="mt-2 text-gray-600">
+    return (
+        <div className="flex min-h-screen items-center justify-center bg-cream p-6">
+        <div className="glass-strong w-full max-w-sm rounded-3xl p-8 text-center">
+            <div className="glass mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full text-2xl">✓</div>
+            <h1 className="text-xl font-bold text-sage">You&apos;re booked!</h1>
+            <p className="mt-2 text-charcoal/60">
             {selectedService?.name} with {selectedStaff?.name} at{' '}
             {selectedSlot && new Date(selectedSlot.start).toLocaleString()}.
             </p>
         </div>
-        );
+        </div>
+    );
     }
 
     return (
-        <div className="mx-auto max-w-sm space-y-6 p-6">
-        <h1 className="text-xl font-semibold">{business.name}</h1>
-        {business.location && <p className="text-sm text-gray-500">{business.location}</p>}
+    <div className="min-h-screen bg-cream px-4 py-8">
+        <div className="mx-auto max-w-sm space-y-6">
+        <div className="glass-strong rounded-3xl p-5 text-center">
+            <h1 className="text-xl font-bold">{business.name}</h1>
+            {business.location && <p className="text-sm text-charcoal/50">{business.location}</p>}
+        </div>
 
-        {/* Step 1: pick a service */}
-        <div>
-            <p className="mb-2 font-medium">Choose a service</p>
+        <div className="glass rounded-3xl p-5">
+            <p className="mb-3 text-sm font-semibold text-charcoal/70">1. Choose a service</p>
             <div className="space-y-2">
             {services.map((s) => (
                 <button
                 key={s.id}
                 onClick={() => setSelectedService(s)}
-                className={`w-full rounded border p-3 text-left ${selectedService?.id === s.id ? 'border-black' : ''}`}
+                className={`w-full rounded-2xl border p-3 text-left transition ${
+                    selectedService?.id === s.id ? 'border-terracotta bg-terracotta/5' : 'border-transparent bg-white/50'
+                }`}
                 >
-                {s.name} — {s.durationMin} min — ₱{s.price}
+                <p className="font-medium">{s.name}</p>
+                <p className="text-sm text-charcoal/50">{s.durationMin} min · ₱{s.price}</p>
                 </button>
             ))}
             </div>
         </div>
 
-        {/* Step 2: pick a staff member */}
         {selectedService && (
-            <div>
-            <p className="mb-2 font-medium">Choose a staff member</p>
+            <div className="glass rounded-3xl p-5">
+            <p className="mb-3 text-sm font-semibold text-charcoal/70">2. Choose a staff member</p>
             <div className="space-y-2">
                 {staff.map((st) => (
                 <button
                     key={st.id}
                     onClick={() => setSelectedStaff(st)}
-                    className={`w-full rounded border p-3 text-left ${selectedStaff?.id === st.id ? 'border-black' : ''}`}
+                    className={`w-full rounded-2xl border p-3 text-left transition ${
+                    selectedStaff?.id === st.id ? 'border-terracotta bg-terracotta/5' : 'border-transparent bg-white/50'
+                    }`}
                 >
                     {st.name}
                 </button>
@@ -132,29 +141,29 @@ export default function PublicBookingPage() {
             </div>
         )}
 
-        {/* Step 3: pick a date */}
         {selectedStaff && (
-            <div>
-            <p className="mb-2 font-medium">Choose a date</p>
+            <div className="glass rounded-3xl p-5">
+            <p className="mb-3 text-sm font-semibold text-charcoal/70">3. Choose a date</p>
             <input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full rounded border px-3 py-2"
+                className="w-full rounded-xl border border-transparent bg-white/50 px-3 py-2 outline-none"
             />
             </div>
         )}
 
-        {/* Step 4: pick a time slot */}
         {date && slots.length > 0 && (
-            <div>
-            <p className="mb-2 font-medium">Choose a time</p>
+            <div className="glass rounded-3xl p-5">
+            <p className="mb-3 text-sm font-semibold text-charcoal/70">4. Choose a time</p>
             <div className="grid grid-cols-3 gap-2">
                 {slots.map((slot) => (
                 <button
                     key={slot.start}
                     onClick={() => setSelectedSlot(slot)}
-                    className={`rounded border p-2 text-sm ${selectedSlot?.start === slot.start ? 'border-black' : ''}`}
+                    className={`rounded-xl border p-2 text-sm transition ${
+                    selectedSlot?.start === slot.start ? 'border-terracotta bg-terracotta text-white' : 'border-transparent bg-white/50'
+                    }`}
                 >
                     {new Date(slot.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </button>
@@ -162,32 +171,35 @@ export default function PublicBookingPage() {
             </div>
             </div>
         )}
-        {date && slots.length === 0 && <p className="text-sm text-gray-500">No open slots on this date.</p>}
+        {date && slots.length === 0 && (
+            <p className="text-center text-sm text-charcoal/50">No open slots on this date.</p>
+        )}
 
-        {/* Step 5: contact details + confirm */}
         {selectedSlot && (
-            <form onSubmit={handleBook} className="space-y-3 rounded border p-4">
+            <form onSubmit={handleBook} className="glass-strong space-y-3 rounded-3xl p-5">
+            <p className="mb-1 text-sm font-semibold text-charcoal/70">5. Your details</p>
             <input
                 type="text"
                 placeholder="Your name"
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
-                className="w-full rounded border px-3 py-2"
+                className="w-full rounded-xl border border-transparent bg-white/60 px-3 py-2 outline-none"
                 required
             />
             <input
                 type="tel"
-                placeholder="Phone number"
+                placeholder="09XX XXX XXXX"
                 value={customerPhone}
                 onChange={(e) => setCustomerPhone(e.target.value)}
-                className="w-full rounded border px-3 py-2"
+                className="w-full rounded-xl border border-transparent bg-white/60 px-3 py-2 outline-none"
                 required
             />
-            <button type="submit" className="w-full rounded bg-black py-2 text-white">
+            <button type="submit" className="w-full rounded-xl bg-terracotta py-3 font-semibold text-white hover:bg-terracotta-dark">
                 Confirm booking
             </button>
             </form>
         )}
         </div>
+    </div>
     );
 }

@@ -66,51 +66,52 @@ export default function ServicesPage() {
     if (error) return <p className="text-red-600">{error}</p>;
 
     return (
-        <div className="max-w-lg space-y-6">
-        <h1 className="text-xl font-semibold">Services</h1>
+    <div className="max-w-lg space-y-6">
+        <h1 className="text-2xl font-bold tracking-tight">Services</h1>
 
-        <form onSubmit={handleCreate} className="space-y-3 rounded border p-4">
-            <input
+        <form onSubmit={handleCreate} className="glass space-y-3 rounded-2xl p-5">
+        <input
             type="text"
-            placeholder="Service name (e.g. Haircut)"
+            placeholder="Service name (e.g. Gel Manicure)"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full rounded border px-3 py-2"
+            className="glass w-full rounded-xl px-3 py-2 outline-none"
+            required
+        />
+        <div className="flex gap-3">
+            <input
+            type="number"
+            placeholder="Duration (min)"
+            value={durationMin}
+            onChange={(e) => setDurationMin(e.target.value)}
+            className="glass w-1/2 rounded-xl px-3 py-2 outline-none"
             required
             />
-            <div className="flex gap-3">
             <input
-                type="number"
-                placeholder="Duration (min)"
-                value={durationMin}
-                onChange={(e) => setDurationMin(e.target.value)}
-                className="w-1/2 rounded border px-3 py-2"
-                required
+            type="number"
+            placeholder="Price (₱)"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            className="glass w-1/2 rounded-xl px-3 py-2 outline-none"
+            required
             />
-            <input
-                type="number"
-                placeholder="Price"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                className="w-1/2 rounded border px-3 py-2"
-                required
-            />
-            </div>
-            <button type="submit" className="rounded bg-black px-4 py-2 text-white">
+        </div>
+        <button type="submit" className="w-full rounded-xl bg-terracotta py-2 font-semibold text-white hover:bg-terracotta-dark">
             Add service
-            </button>
+        </button>
         </form>
 
         <ul className="space-y-2">
-            {services.map((s) => (
-            <li key={s.id} className="rounded border p-3">
-                <p className="font-medium">{s.name}</p>
-                <p className="text-sm text-gray-500">
-                {s.durationMin} min — ₱{s.price}
-                </p>
+        {services.map((s) => (
+            <li key={s.id} className="glass flex items-center justify-between rounded-2xl p-4">
+            <div>
+                <p className="font-semibold">{s.name}</p>
+                <p className="text-sm text-charcoal/50">{s.durationMin} min</p>
+            </div>
+            <span className="rounded-full bg-sage/20 px-3 py-1 text-sm font-semibold text-sage">₱{s.price}</span>
             </li>
-            ))}
+        ))}
         </ul>
-        </div>
+    </div>
     );
 }

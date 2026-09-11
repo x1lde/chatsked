@@ -19,7 +19,7 @@ export default function LoginPage() {
             body: JSON.stringify({ email, password }),
         });
         localStorage.setItem('token', data.accessToken);
-        router.push('/');
+        router.push('/dashboard');
         } catch (err) {
         const message = err instanceof Error ? err.message : 'Login failed — check your details.';
         setError(message);
