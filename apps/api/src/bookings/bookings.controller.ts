@@ -30,7 +30,13 @@ export class BookingsController {
     @UseGuards(JwtAuthGuard)
     @Get('bookings')
     findToday(@Query('businessId') businessId: string) {
-    return this.bookingsService.findTodayForBusiness(businessId);
+        return this.bookingsService.findTodayForBusiness(businessId);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('bookings/all')
+    findAll(@Query('businessId') businessId: string) {
+        return this.bookingsService.findAllForBusiness(businessId);
     }
 
     @UseGuards(JwtAuthGuard)

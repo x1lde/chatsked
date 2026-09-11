@@ -51,19 +51,19 @@ export class BookingsService {
         customerPhone: string;
         messengerPsid?: string;
         source: 'MESSENGER' | 'SMS' | 'MANUAL';
-        }) {
+    }) {
         const service = await this.prisma.service.findUniqueOrThrow({ where: { id: dto.serviceId } });
         const startsAt = new Date(dto.startsAt);
         const endsAt = new Date(startsAt.getTime() + service.durationMin * 60000);
 
         const customer = await this.prisma.customer.upsert({
-            where: { businessId_phone: { businessId, phone: dto.customerPhone } },
-            update: { name: dto.customerName, ...(dto.messengerPsid && { messengerPsid: dto.messengerPsid }) },
-            create: { businessId, name: dto.customerName, phone: dto.customerPhone, messengerPsid: dto.messengerPsid },
+        where: { businessId_phone: { businessId, phone: dto.customerPhone } },
+        update: { name: dto.customerName, ...(dto.messengerPsid && { messengerPsid: dto.messengerPsid }) },
+        create: { businessId, name: dto.customerName, phone: dto.customerPhone, messengerPsid: dto.messengerPsid },
         });
 
         const booking = await this.prisma.booking.create({
-            data: {
+        data: {
             businessId,
             serviceId: dto.serviceId,
             staffId: dto.staffId,
@@ -71,30 +71,45 @@ export class BookingsService {
             startsAt,
             endsAt,
             source: dto.source,
-            },
+        },
         });
 
-        const testTime = new Date(Date.now() + 30 * 1000); // 30 seconds from now
-        await this.remindersService.schedule(booking.id, 'H2', testTime);
+        const h24 = new Date(booking.startsAt.getTime() - 24 * 60 * 60 * 1000);
+        const h2 = new Date(booking.startsAt.getTime() - 2 * 60 * 60 * 1000);
+        const now = Date.now();
+
+        if (h24.getTime() > now) await this.remindersService.schedule(booking.id, 'H24', h24);
+        if (h2.getTime() > now) await this.remindersService.schedule(booking.id, 'H2', h2);
 
         return booking;
     }
 
     async findTodayForBusiness(businessId: string) {
-    const dayStart = new Date();
-    dayStart.setHours(0, 0, 0, 0);
-    const dayEnd = new Date();
-    dayEnd.setHours(23, 59, 59, 999);
+        const dayStart = new Date();
+        dayStart.setHours(0, 0, 0, 0);
+        const dayEnd = new Date();
+        dayEnd.setHours(23, 59, 59, 999);
 
-    return this.prisma.booking.findMany({
+        return this.prisma.booking.findMany({
         where: {
-        businessId,
-        startsAt: { gte: dayStart, lte: dayEnd },
-        status: { not: 'CANCELLED' },
+            businessId,
+            startsAt: { gte: dayStart, lte: dayEnd },
+            status: { not: 'CANCELLED' },
         },
         include: { service: true, staff: true, customer: true },
         orderBy: { startsAt: 'asc' },
-    });
+        });
+    }
+
+    findAllForBusiness(businessId: string) {
+        return this.prisma.booking.findMany({
+        where: {
+            businessId,
+            status: { not: 'CANCELLED' },
+        },
+        include: { service: true, staff: true, customer: true },
+        orderBy: { startsAt: 'asc' },
+        });
     }
 
     updateStatus(id: string, status: 'COMPLETED' | 'NO_SHOW' | 'CANCELLED') {

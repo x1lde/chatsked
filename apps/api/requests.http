@@ -1,13 +1,13 @@
-###
+### 1. Sign up (creates a fresh account after your DB reset)
 POST http://localhost:3000/auth/signup
 Content-Type: application/json
 
 {
     "email": "test@example.com",
-    "password": "somepassword123"
+    "password": "12345678"
 }
 
-###
+### 2. Log in (use this anytime you need a fresh token — tokens last 7 days)
 POST http://localhost:3000/auth/login
 Content-Type: application/json
 
@@ -16,125 +16,82 @@ Content-Type: application/json
     "password": "somepassword123"
 }
 
-###
-POST http://localhost:3000/services
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR1azB2bm4wMDAwNHEyOGIxbDA1aHV2IiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzg4OTg3NDcyLCJleHAiOjE3ODk1OTIyNzJ9.Cqr-VZ2aO6kzxw9D-Nx3oPNjdlSJSkP54v9t1Nilk8M
+### ============================================
+### Paste your token below and reuse it in every
+### request that needs "Authorization: Bearer ..."
+### ============================================
 
-{
-    "businessId": "cmtul68qr00014q52oi2itcsw",
-    "name": "Haircut",
-    "durationMin": 30,
-    "price": 250
-}
-
-###
-GET http://localhost:3000/services?businessId=cmtul68qr00014q52oi2itcsw
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR1azB2bm4wMDAwNHEyOGIxbDA1aHV2IiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzg4OTg3NDcyLCJleHAiOjE3ODk1OTIyNzJ9.Cqr-VZ2aO6kzxw9D-Nx3oPNjdlSJSkP54v9t1Nilk8M
-
-###
+### 3. Create a business (grab the "slug" and "id" from the response)
 POST http://localhost:3000/businesses
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR1azB2bm4wMDAwNHEyOGIxbDA1aHV2IiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzg4OTg3ODI5LCJleHAiOjE3ODk1OTI2Mjl9.2wY8X9vvWsP8pNn-BhNUQOB1VxBnA2lvqG8UEpFgidI
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR4ZHJteWUwMDAwNHE4bjZyajBydWtwIiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzg5MTU2ODA2LCJleHAiOjE3ODk3NjE2MDZ9.Jbs70Nh9N7MoEulq2i-m6wADYR4CpAUdE-f1tsQwl8g
 
 {
-    "name": "Miel's Barbershop",
+    "name": "Test Business",
     "location": "Sto. Tomas, Batangas"
 }
 
-###
-POST http://localhost:3000/staff
+### 4. List your businesses (if you forget the slug/id later)
+GET http://localhost:3000/businesses
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR4ZHJteWUwMDAwNHE4bjZyajBydWtwIiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzg5MTU2ODA2LCJleHAiOjE3ODk3NjE2MDZ9.Jbs70Nh9N7MoEulq2i-m6wADYR4CpAUdE-f1tsQwl8g
+
+### 5. Create a service (paste businessId from step 3)
+POST http://localhost:3000/services
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR1azB2bm4wMDAwNHEyOGIxbDA1aHV2IiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzg4OTg3ODI5LCJleHAiOjE3ODk1OTI2Mjl9.2wY8X9vvWsP8pNn-BhNUQOB1VxBnA2lvqG8UEpFgidI
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR4ZHJteWUwMDAwNHE4bjZyajBydWtwIiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzg5MTU2ODA2LCJleHAiOjE3ODk3NjE2MDZ9.Jbs70Nh9N7MoEulq2i-m6wADYR4CpAUdE-f1tsQwl8g
 
 {
-    "businessId": "cmtul68qr00014q52oi2itcsw",
-    "name": "Juan Dela Cruz"
+    "businessId": "cmtxdsc1600024q8nnov0t5up",
+    "name": "Test Service",
+    "durationMin": 30,
+    "price": 300
 }
 
-###
-GET http://localhost:3000/customers?businessId=cmtul68qr00014q52oi2itcsw
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR1azB2bm4wMDAwNHEyOGIxbDA1aHV2IiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzg4OTg3ODI5LCJleHAiOjE3ODk1OTI2Mjl9.2wY8X9vvWsP8pNn-BhNUQOB1VxBnA2lvqG8UEpFgidI
+### 6. Create a staff member (paste businessId from step 3)
+POST http://localhost:3000/staff
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR4ZHJteWUwMDAwNHE4bjZyajBydWtwIiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzg5MTU2ODA2LCJleHAiOjE3ODk3NjE2MDZ9.Jbs70Nh9N7MoEulq2i-m6wADYR4CpAUdE-f1tsQwl8g
 
-###
-GET http://localhost:3000/public/availability?serviceId=cmtul81sd00034q52u95b8zda&staffId=cmtumgctt00014q3dmbmikb4j&date=2026-09-15
+{
+    "businessId": "cmtxdsc1600024q8nnov0t5up",
+    "name": "Test Staff"
+}
 
-###
+### 7. List services (grab serviceId if needed)
+GET http://localhost:3000/services?businessId=cmtxdsc1600024q8nnov0t5up
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR4ZHJteWUwMDAwNHE4bjZyajBydWtwIiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzg5MTU2ODA2LCJleHAiOjE3ODk3NjE2MDZ9.Jbs70Nh9N7MoEulq2i-m6wADYR4CpAUdE-f1tsQwl8g
+
+### 8. List staff (grab staffId if needed)
+GET http://localhost:3000/staff?businessId=cmtxdsc1600024q8nnov0t5up
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR4ZHJteWUwMDAwNHE4bjZyajBydWtwIiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzg5MTU2ODA2LCJleHAiOjE3ODk3NjE2MDZ9.Jbs70Nh9N7MoEulq2i-m6wADYR4CpAUdE-f1tsQwl8g
+
+### 9. Check availability for Dec 3, 2026 (paste serviceId + staffId)
+GET http://localhost:3000/public/availability?serviceId=cmtxdtoo600044q8n43enyckg&staffId=cmtxdu3tn00064q8n6tenefyt&date=2026-12-03
+
+### 10. Create a booking for Dec 3, 2026 directly via API
+### (or just use the actual public booking page at
+### http://localhost:3001/book/YOUR_SLUG instead of this)
 POST http://localhost:3000/public/bookings
 Content-Type: application/json
 
 {
-    "businessId": "cmtul68qr00014q52oi2itcsw",
-    "serviceId": "cmtul81sd00034q52u95b8zda",
-    "staffId": "cmtumgctt00014q3dmbmikb4j",
-    "startsAt": "2026-09-15T09:00:00",
-    "customerName": "Test Customer",
+    "businessId": "cmtxdsc1600024q8nnov0t5up",
+    "serviceId": "cmtxdtoo600044q8n43enyckg",
+    "staffId": "cmtxdu3tn00064q8n6tenefyt",
+    "startsAt": "2026-12-03T14:00:00",
+    "customerName": "Dec Test Customer",
     "customerPhone": "09171234567"
 }
 
-###
-PATCH http://localhost:3000/bookings/cmtumop1t00074q3dvadchrbi/status
+### 11. List today's bookings for this business
+### (should NOT include the Dec 3 booking — only today's date)
+GET http://localhost:3000/bookings?businessId=cmtxdsc1600024q8nnov0t5up
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR4ZHJteWUwMDAwNHE4bjZyajBydWtwIiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzg5MTU2ODA2LCJleHAiOjE3ODk3NjE2MDZ9.Jbs70Nh9N7MoEulq2i-m6wADYR4CpAUdE-f1tsQwl8g
+
+### 12. Check a specific booking's status directly
+### (paste the booking id from step 10's response)
+PATCH http://localhost:3000/bookings/cmtxe154a000g4q8n34ykakcc/status
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR1azB2bm4wMDAwNHEyOGIxbDA1aHV2IiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzg4OTg3ODI5LCJleHAiOjE3ODk1OTI2Mjl9.2wY8X9vvWsP8pNn-BhNUQOB1VxBnA2lvqG8UEpFgidI
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR4ZHJteWUwMDAwNHE4bjZyajBydWtwIiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzg5MTU2ODA2LCJleHAiOjE3ODk3NjE2MDZ9.Jbs70Nh9N7MoEulq2i-m6wADYR4CpAUdE-f1tsQwl8g
 
-{ "status": "NO_SHOW" }
-
-###
-GET http://localhost:3000/webhooks/messenger?hub.mode=subscribe&hub.verify_token=chatsked_verify_123&hub.challenge=test12345
-
-###
-POST http://localhost:3000/public/bookings
-Content-Type: application/json
-
-{
-    "businessId": "cmtul68qr00014q52oi2itcsw",
-    "serviceId": "cmtumizs800034q3drfjmuvnv",
-    "staffId": "cmtumgctt00014q3dmbmikb4j",
-    "startsAt": "2026-09-16T09:00:00",
-    "customerName": "Reminder Test",
-    "customerPhone": "09191234567"
-}
-
-###
-POST http://localhost:3000/auth/login
-Content-Type: application/json
-
-{
-    "email": "test@example.com",
-    "password": "3288"
-}
-
-###
-GET http://localhost:3000/businesses
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR3M214ZDUwMDAwNHF1bGk3b3VxYXliIiwiZW1haWwiOiJ0ZXN0MUBleGFtcGxlLmNvbSIsImlhdCI6MTc4OTA3OTM1MSwiZXhwIjoxNzg5Njg0MTUxfQ.fl0wLk3GFQA1nzFY4DKczFHrNpP85sDBtz_3UVoyLdk
-
-###
-GET http://localhost:3000/services?businessId=cmtw3n2dg00024quljnaod8is
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR3M214ZDUwMDAwNHF1bGk3b3VxYXliIiwiZW1haWwiOiJ0ZXN0MUBleGFtcGxlLmNvbSIsImlhdCI6MTc4OTA3OTM1MSwiZXhwIjoxNzg5Njg0MTUxfQ.fl0wLk3GFQA1nzFY4DKczFHrNpP85sDBtz_3UVoyLdk
-
-###
-GET http://localhost:3000/staff?businessId=cmtw3n2dg00024quljnaod8is
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR3M214ZDUwMDAwNHF1bGk3b3VxYXliIiwiZW1haWwiOiJ0ZXN0MUBleGFtcGxlLmNvbSIsImlhdCI6MTc4OTA3OTM1MSwiZXhwIjoxNzg5Njg0MTUxfQ.fl0wLk3GFQA1nzFY4DKczFHrNpP85sDBtz_3UVoyLdk
-
-###
-POST http://localhost:3000/public/bookings
-Content-Type: application/json
-
-    {
-    "businessId": "cmtw3n2dg00024quljnaod8is",
-    "serviceId": "cmtw3oxug00044qulf6871me2",
-    "staffId": "cmtw3p4nq00064qul5sjwh6pc",
-    "startsAt": "2026-09-11T14:00:00",
-    "customerName": "Frontend Test Customer",
-    "customerPhone": "09171112222"
-}
-
-###
-GET http://localhost:3000/businesses/
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR3YjY3enowMDAwNHFucG9sMG9jbDJiIiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzg5MDkyMDk4LCJleHAiOjE3ODk2OTY4OTh9.doQyAJJ7HKhEyj9BaUDjNKdG1f8awrmifS02lwzlqz0
-
-###
-GET http://localhost:3000/public/businesses/test-barbershop
-
-###
-GET http://localhost:3000/public/staff?businessId=cmtwb6kqc00024qnpm3ku1hui
+{ "status": "COMPLETED" }

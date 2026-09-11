@@ -5,6 +5,18 @@ import { PrismaService } from '../prisma/prisma.service.js';
 export class CustomersService {
     constructor(private prisma: PrismaService) {}
 
+    async findOneWithHistory(id: string) {
+        return this.prisma.customer.findUniqueOrThrow({
+            where: { id },
+            include: {
+            bookings: {
+                include: { service: true, staff: true },
+                orderBy: { startsAt: 'desc' },
+            },
+            },
+        });
+    }
+
     findAllForBusiness(businessId: string) {
         return this.prisma.customer.findMany({ where: { businessId } });
     }

@@ -5,11 +5,16 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 @UseGuards(JwtAuthGuard)
 @Controller('customers')
 export class CustomersController {
-    constructor(private customersService: CustomersService) {}
+    constructor(private readonly customersService: CustomersService) {}
 
     @Get()
     findAll(@Query('businessId') businessId: string) {
         return this.customersService.findAllForBusiness(businessId);
+    }
+
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return this.customersService.findOneWithHistory(id);
     }
 
     @Patch(':id')

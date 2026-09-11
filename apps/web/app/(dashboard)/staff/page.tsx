@@ -66,7 +66,7 @@ export default function StaffPage() {
     }
 
     return (
-        <div className="max-w-lg space-y-6">
+        <div className="mx-auto max-w-2xl space-y-6">
         <h1 className="text-2xl font-bold tracking-tight">Staff</h1>
 
         <form onSubmit={handleCreate} className="glass space-y-3 rounded-2xl p-5">

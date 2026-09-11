@@ -9,21 +9,32 @@ type Booking = {
     id: string;
     startsAt: string;
     status: string;
-    service: { name: string };
+    service: { name: string; price: string };
     staff: { name: string };
     customer: { name: string; phone: string };
 };
 
+type Business = { id: string; name: string };
+
 export default function DashboardHomePage() {
     const { showToast } = useToast();
+    const [business, setBusiness] = useState<Business | null>(null);
     const [bookings, setBookings] = useState<Booking[]>([]);
-    const [businessId, setBusinessId] = useState<string | null>(null);
+    const [upcomingBookings, setUpcomingBookings] = useState<Booking[]>([]);
     const [needsBusiness, setNeedsBusiness] = useState(false);
     const [businessName, setBusinessName] = useState('');
+    const [loading, setLoading] = useState(true);
 
-    async function loadBookings(biz: string) {
-        const todaysBookings = await apiFetch(`/bookings?businessId=${biz}`);
+    async function loadAll(biz: Business) {
+        const todaysBookings = await apiFetch(`/bookings?businessId=${biz.id}`);
         setBookings(todaysBookings);
+
+        const all = await apiFetch(`/bookings/all?businessId=${biz.id}`);
+        const now = Date.now();
+        const future = all.filter(
+        (b: Booking) => new Date(b.startsAt).getTime() > now && b.status === 'CONFIRMED'
+        );
+        setUpcomingBookings(future);
     }
 
     useEffect(() => {
@@ -32,14 +43,17 @@ export default function DashboardHomePage() {
             const businesses = await apiFetch('/businesses');
             if (businesses.length === 0) {
             setNeedsBusiness(true);
+            setLoading(false);
             return;
             }
-            const biz = businesses[0].id;
-            setBusinessId(biz);
-            await loadBookings(biz);
+            const biz = businesses[0];
+            setBusiness(biz);
+            await loadAll(biz);
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Failed to load businesses';
             showToast(message, 'error');
+        } finally {
+            setLoading(false);
         }
         }
         load();
@@ -52,10 +66,10 @@ export default function DashboardHomePage() {
             method: 'POST',
             body: JSON.stringify({ name: businessName }),
         });
-        setBusinessId(biz.id);
+        setBusiness(biz);
         setNeedsBusiness(false);
         showToast('Business created!');
-        await loadBookings(biz.id);
+        await loadAll(biz);
         } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to create business';
         showToast(message, 'error');
@@ -75,6 +89,8 @@ export default function DashboardHomePage() {
         showToast(message, 'error');
         }
     }
+
+    if (loading) return <PageLoader />;
 
     if (needsBusiness) {
         return (
@@ -97,27 +113,30 @@ export default function DashboardHomePage() {
         );
     }
 
-    if (!businessId) return <PageLoader />;
-
-    const completedToday = bookings.filter((b) => b.status === 'COMPLETED').length;
-    const upcomingToday = bookings.filter((b) => b.status === 'CONFIRMED').length;
+    const completedToday = bookings.filter((b) => b.status === 'COMPLETED');
+    const pendingToday = bookings.filter((b) => b.status === 'CONFIRMED').length;
+    const revenueToday = completedToday.reduce((sum, b) => sum + Number(b.service.price), 0);
 
     return (
-        <div className="space-y-6">
-        <h1 className="text-2xl font-bold tracking-tight">Good day 👋</h1>
+        <div className="space-y-8">
+        <h1 className="text-2xl font-bold tracking-tight">Good day{business ? `, ${business.name}` : ''} 👋</h1>
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div className="glass rounded-2xl p-4 text-center">
             <p className="text-2xl font-bold">{bookings.length}</p>
             <p className="text-xs text-charcoal/50">Today</p>
             </div>
             <div className="glass rounded-2xl p-4 text-center">
-            <p className="text-2xl font-bold">{completedToday}</p>
+            <p className="text-2xl font-bold">{completedToday.length}</p>
             <p className="text-xs text-charcoal/50">Completed</p>
             </div>
             <div className="glass rounded-2xl p-4 text-center">
-            <p className="text-2xl font-bold">{upcomingToday}</p>
-            <p className="text-xs text-charcoal/50">Upcoming</p>
+            <p className="text-2xl font-bold">{pendingToday}</p>
+            <p className="text-xs text-charcoal/50">Pending</p>
+            </div>
+            <div className="glass rounded-2xl p-4 text-center">
+            <p className="text-2xl font-bold text-sage">₱{revenueToday.toLocaleString()}</p>
+            <p className="text-xs text-charcoal/50">Revenue</p>
             </div>
         </div>
 
@@ -146,6 +165,27 @@ export default function DashboardHomePage() {
                     {b.status.replace('_', ' ')}
                     </span>
                 )}
+                </li>
+            ))}
+            </ul>
+        </div>
+
+        <div>
+            <h2 className="mb-3 text-lg font-semibold">Upcoming Bookings</h2>
+            {upcomingBookings.length === 0 && <p className="text-charcoal/50">Nothing scheduled beyond today.</p>}
+            <ul className="space-y-3">
+            {upcomingBookings.map((b) => (
+                <li key={b.id} className="glass flex items-center justify-between rounded-2xl p-4">
+                <div>
+                    <p className="font-semibold">{b.service.name} — {b.customer.name}</p>
+                    <p className="text-sm text-charcoal/50">
+                    {new Date(b.startsAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} at{' '}
+                    {new Date(b.startsAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} with {b.staff.name}
+                    </p>
+                </div>
+                <span className="rounded-full bg-terracotta/10 px-3 py-1 text-xs font-semibold text-terracotta">
+                    {new Date(b.startsAt).toLocaleDateString(undefined, { weekday: 'short' })}
+                </span>
                 </li>
             ))}
             </ul>
