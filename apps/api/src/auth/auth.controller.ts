@@ -1,9 +1,15 @@
 import { Body, Controller, Post } from '@nestjs/common';
+import { IsEmail, IsString, MinLength } from 'class-validator';
+
 import { AuthService } from './auth.service.js';
 
 class AuthDto {
-    email: string;
-    password: string;
+    @IsEmail()
+    email!: string;
+
+    @IsString()
+    @MinLength(8)
+    password!: string;
 }
 
 @Controller('auth')
