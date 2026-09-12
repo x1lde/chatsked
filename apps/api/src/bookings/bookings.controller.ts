@@ -1,12 +1,15 @@
 import { Body, Controller, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { BookingsService } from './bookings.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
+import { HmacGuard } from '../common/hmac.guard.js';
 import { CreatePublicBookingDto } from './dto/create-booking.dto.js';
 
 @Controller()
 export class BookingsController {
     constructor(private bookingsService: BookingsService) {}
 
+    @Throttle({ default: { limit: 20, ttl: 60_000 } })
     @Get('public/availability')
     getAvailability(
         @Query('businessId') businessId: string,
@@ -17,6 +20,8 @@ export class BookingsController {
         return this.bookingsService.getAvailableSlots(businessId, serviceId, staffId, date);
     }
 
+    @UseGuards(HmacGuard)
+    @Throttle({ default: { limit: 5, ttl: 60_000 } })
     @Post('public/bookings')
     createPublicBooking(@Body() dto: CreatePublicBookingDto) {
         return this.bookingsService.createBooking(dto.businessId, { ...dto, source: 'MESSENGER' });

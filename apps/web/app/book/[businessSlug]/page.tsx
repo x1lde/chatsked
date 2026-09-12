@@ -13,6 +13,13 @@ type Service = { id: string; name: string; durationMin: number; price: string };
 type Staff = { id: string; name: string };
 type Slot = { start: string; end: string };
 
+function toLocalIsoDate(d: Date): string {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
 export default function PublicBookingPage() {
     const params = useParams();
     const slug = params.businessSlug as string;
@@ -65,7 +72,7 @@ export default function PublicBookingPage() {
         async function loadSlots() {
         setLoadingSlots(true);
         try {
-            const dateStr = selectedDay!.toISOString().split('T')[0];
+            const dateStr = toLocalIsoDate(selectedDay!);
             const url = `${API_URL}/public/availability?serviceId=${selectedService!.id}&staffId=${selectedStaff!.id}&date=${dateStr}`;
             const data = await fetch(url).then((r) => r.json());
             setSlots(data);
@@ -106,7 +113,7 @@ export default function PublicBookingPage() {
 
     async function refreshSlots() {
         if (!selectedService || !selectedStaff || !selectedDay) return;
-        const dateStr = selectedDay.toISOString().split('T')[0];
+        const dateStr = toLocalIsoDate(selectedDay);
         const url = `${API_URL}/public/availability?serviceId=${selectedService.id}&staffId=${selectedStaff.id}&date=${dateStr}`;
         const data = await fetch(url).then((r) => r.json());
         setSlots(data);
@@ -117,7 +124,7 @@ export default function PublicBookingPage() {
         if (!business || !selectedService || !selectedStaff || !selectedSlot) return;
         setSubmitting(true);
         try {
-        const res = await fetch(`${API_URL}/public/bookings`, {
+        const res = await fetch('/api/book', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -175,18 +182,10 @@ export default function PublicBookingPage() {
     ];
 
     return (
-        <div className="min-h-screen bg-cream px-4 py-8">
-        <div className="mx-auto max-w-sm space-y-6">
-            <div className="glass-strong rounded-3xl p-5 text-center">
-            <h1 className="text-xl font-bold">{business.name}</h1>
-            {business.location && <p className="text-sm text-charcoal/50">{business.location}</p>}
-            </div>
+        <div className="min-h-screen bg-cream p-4">
+        <div className="mx-auto max-w-sm space-y-4">
 
-            {error && (
-            <div className="rounded-xl bg-amber/20 px-4 py-3 text-sm font-medium text-amber">{error}</div>
-            )}
-
-            <div className="glass flex items-center justify-between rounded-2xl px-4 py-3">
+            <div className="mb-2 flex items-center justify-between px-1">
             {steps.map((s, i) => (
                 <div key={s.label} className="flex flex-1 flex-col items-center">
                 <div className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${

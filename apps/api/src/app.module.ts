@@ -11,9 +11,12 @@ import { CustomersModule } from './customers/customers.module.js';
 import { BookingsModule } from './bookings/bookings.module.js';
 import { RemindersModule } from './reminders/reminders.module.js';
 import { MessengerModule } from './webhooks/messenger.module.js';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([{ name: 'default', ttl: 60_000, limit: 60 }]), // 60 req/min/IP baseline
     PrismaModule,
     BusinessAccessModule,
     AuthModule,
@@ -26,6 +29,9 @@ import { MessengerModule } from './webhooks/messenger.module.js';
     MessengerModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
+  ],
 })
 export class AppModule {}
