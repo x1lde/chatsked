@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { RemindersService } from '../reminders/reminders.service.js';
 import { BusinessAccessService } from '../common/business-access.service.js';
@@ -57,29 +58,58 @@ export class BookingsService {
         // ownerId is only present for the authenticated "manual booking" path.
         // The public booking flow is intentionally unauthenticated.
         if (ownerId) {
-            await this.businessAccess.assertOwnsBusiness(ownerId, businessId);
+        await this.businessAccess.assertOwnsBusiness(ownerId, businessId);
         }
+
         const service = await this.prisma.service.findUniqueOrThrow({ where: { id: dto.serviceId } });
         const startsAt = new Date(dto.startsAt);
         const endsAt = new Date(startsAt.getTime() + service.durationMin * 60000);
 
-        const customer = await this.prisma.customer.upsert({
-        where: { businessId_phone: { businessId, phone: dto.customerPhone } },
-        update: { name: dto.customerName, ...(dto.messengerPsid && { messengerPsid: dto.messengerPsid }) },
-        create: { businessId, name: dto.customerName, phone: dto.customerPhone, messengerPsid: dto.messengerPsid },
-        });
+        let booking;
+        try {
+        booking = await this.prisma.$transaction(
+            async (tx) => {
+            // Re-check for overlap right before inserting — this is the race-condition fix.
+            const conflict = await tx.booking.findFirst({
+                where: {
+                staffId: dto.staffId,
+                status: { not: 'CANCELLED' },
+                startsAt: { lt: endsAt },
+                endsAt: { gt: startsAt },
+                },
+            });
+            if (conflict) {
+                throw new ConflictException('This time slot was just booked by someone else. Please pick another.');
+            }
 
-        const booking = await this.prisma.booking.create({
-        data: {
-            businessId,
-            serviceId: dto.serviceId,
-            staffId: dto.staffId,
-            customerId: customer.id,
-            startsAt,
-            endsAt,
-            source: dto.source,
-        },
-        });
+            const customer = await tx.customer.upsert({
+                where: { businessId_phone: { businessId, phone: dto.customerPhone } },
+                update: { name: dto.customerName, ...(dto.messengerPsid && { messengerPsid: dto.messengerPsid }) },
+                create: { businessId, name: dto.customerName, phone: dto.customerPhone, messengerPsid: dto.messengerPsid },
+            });
+
+            return tx.booking.create({
+                data: {
+                businessId,
+                serviceId: dto.serviceId,
+                staffId: dto.staffId,
+                customerId: customer.id,
+                startsAt,
+                endsAt,
+                source: dto.source,
+                },
+            });
+            },
+            { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+        );
+        } catch (err) {
+        // Postgres throws a serialization-failure error (P2034) if two transactions
+        // genuinely collided at the same instant — treat that the same as our own conflict check.
+        if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2034') {
+            throw new ConflictException('This time slot was just booked by someone else. Please pick another.');
+        }
+        throw err;
+        }
 
         const h24 = new Date(booking.startsAt.getTime() - 24 * 60 * 60 * 1000);
         const h2 = new Date(booking.startsAt.getTime() - 2 * 60 * 60 * 1000);

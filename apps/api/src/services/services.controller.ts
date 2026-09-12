@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ServicesService } from './services.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
+import { CreateServiceDto } from './dto/create-service.dto.js';
 
 @Controller()
 export class ServicesController {
@@ -8,7 +9,7 @@ export class ServicesController {
 
     @UseGuards(JwtAuthGuard)
     @Post('services')
-    create(@Body() dto: { businessId: string; name: string; durationMin: number; price: number }, @Req() req: any) {
+    create(@Body() dto: CreateServiceDto, @Req() req: any) {
         return this.servicesService.create(req.user.sub, dto.businessId, {
         name: dto.name,
         durationMin: dto.durationMin,

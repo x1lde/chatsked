@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { BusinessesService } from './businesses.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
+import { CreateBusinessDto } from './dto/create-business.dto.js';
 
 @Controller()
 export class BusinessesController {
@@ -8,7 +9,7 @@ export class BusinessesController {
 
     @UseGuards(JwtAuthGuard)
     @Post('businesses')
-    create(@Body() dto: { name: string; location?: string }, @Req() req: any) {
+    create(@Body() dto: CreateBusinessDto, @Req() req: any) {
         return this.businessesService.create(req.user.sub, dto);
     }
 

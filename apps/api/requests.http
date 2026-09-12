@@ -95,3 +95,16 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbXR4ZHJteWUwMDAwNHE4bjZyajBydWtwIiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzg5MTU2ODA2LCJleHAiOjE3ODk3NjE2MDZ9.Jbs70Nh9N7MoEulq2i-m6wADYR4CpAUdE-f1tsQwl8g
 
 { "status": "COMPLETED" }
+
+###
+POST http://localhost:3000/public/bookings
+Content-Type: application/json
+
+{
+    "businessId": "some-id",
+    "serviceId": "some-id",
+    "staffId": "some-id",
+    "startsAt": "not-a-real-date",
+    "customerName": "",
+    "customerPhone": "123"
+}

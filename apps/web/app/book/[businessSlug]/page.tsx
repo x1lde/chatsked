@@ -32,6 +32,7 @@ export default function PublicBookingPage() {
     const [confirmed, setConfirmed] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
+    const [loadFailed, setLoadFailed] = useState(false);
     const [loadingSlots, setLoadingSlots] = useState(false);
 
     const staffStepRef = useRef<HTMLDivElement>(null);
@@ -53,7 +54,7 @@ export default function PublicBookingPage() {
             const stf = await fetch(`${API_URL}/public/staff?businessId=${biz.id}`).then((r) => r.json());
             setStaff(stf);
         } catch {
-            setError('Could not load this business. Check the link and try again.');
+            setLoadFailed(true);
         }
         }
         load();
@@ -103,6 +104,14 @@ export default function PublicBookingPage() {
         setCustomerPhone(digitsOnly);
     }
 
+    async function refreshSlots() {
+        if (!selectedService || !selectedStaff || !selectedDay) return;
+        const dateStr = selectedDay.toISOString().split('T')[0];
+        const url = `${API_URL}/public/availability?serviceId=${selectedService.id}&staffId=${selectedStaff.id}&date=${dateStr}`;
+        const data = await fetch(url).then((r) => r.json());
+        setSlots(data);
+    }
+
     async function handleBook(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!business || !selectedService || !selectedStaff || !selectedSlot) return;
@@ -120,6 +129,16 @@ export default function PublicBookingPage() {
             customerPhone,
             }),
         });
+
+        if (res.status === 409) {
+            setError('That time slot was just taken. Please pick another time.');
+            setSelectedSlot(null);
+            await refreshSlots();
+            scrollTo(timeStepRef);
+            setTimeout(() => setError(''), 4000);
+            return;
+        }
+
         if (!res.ok) throw new Error('Booking failed');
         setConfirmed(true);
         } catch {
@@ -130,7 +149,7 @@ export default function PublicBookingPage() {
         }
     }
 
-    if (error) return <p className="p-6 text-red-600">{error}</p>;
+    if (loadFailed) return <p className="p-6 text-red-600">Could not load this business. Check the link and try again.</p>;
     if (!business) return <PageLoader />;
 
     if (confirmed) {
@@ -162,6 +181,10 @@ export default function PublicBookingPage() {
             <h1 className="text-xl font-bold">{business.name}</h1>
             {business.location && <p className="text-sm text-charcoal/50">{business.location}</p>}
             </div>
+
+            {error && (
+            <div className="rounded-xl bg-amber/20 px-4 py-3 text-sm font-medium text-amber">{error}</div>
+            )}
 
             <div className="glass flex items-center justify-between rounded-2xl px-4 py-3">
             {steps.map((s, i) => (

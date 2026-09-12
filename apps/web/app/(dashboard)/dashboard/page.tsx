@@ -24,6 +24,7 @@ export default function DashboardHomePage() {
     const [needsBusiness, setNeedsBusiness] = useState(false);
     const [businessName, setBusinessName] = useState('');
     const [loading, setLoading] = useState(true);
+    const [confirmingCancel, setConfirmingCancel] = useState<string | null>(null);
 
     async function loadAll(biz: Business) {
         const todaysBookings = await apiFetch(`/bookings?businessId=${biz.id}`);
@@ -154,8 +155,8 @@ export default function DashboardHomePage() {
                     <div className="flex gap-2">
                     <button onClick={() => updateStatus(b.id, 'COMPLETED')} className="rounded-full bg-sage px-3 py-1.5 text-xs font-semibold text-white">Completed</button>
                     <button onClick={() => updateStatus(b.id, 'NO_SHOW')} className="rounded-full bg-amber px-3 py-1.5 text-xs font-semibold text-white">No-show</button>
-                    <button onClick={() => updateStatus(b.id, 'CANCELLED')} className="rounded-full bg-terracotta px-3 py-1.5 text-xs font-semibold text-white">Cancel</button>
-                    </div>
+                    <button onClick={() => setConfirmingCancel(b.id)} className="rounded-full bg-terracotta px-3 py-1.5 text-xs font-semibold text-white">Cancel</button>
+                </div>
                 ) : (
                     <span className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${
                     b.status === 'COMPLETED' ? 'bg-sage/20 text-sage' :
@@ -190,6 +191,32 @@ export default function DashboardHomePage() {
             ))}
             </ul>
         </div>
+
+        {confirmingCancel && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+            <div className="glass-strong w-full max-w-xs rounded-3xl p-6 text-center">
+                <p className="mb-4 font-semibold">Cancel this booking?</p>
+                <p className="mb-5 text-sm text-charcoal/60">This can&apos;t be undone.</p>
+                <div className="flex gap-3">
+                <button
+                    onClick={() => setConfirmingCancel(null)}
+                    className="flex-1 rounded-xl bg-charcoal/10 py-2 font-semibold text-charcoal"
+                >
+                    Keep it
+                </button>
+                <button
+                    onClick={() => {
+                    updateStatus(confirmingCancel, 'CANCELLED');
+                    setConfirmingCancel(null);
+                    }}
+                    className="flex-1 rounded-xl bg-terracotta py-2 font-semibold text-white"
+                >
+                    Yes, cancel
+                </button>
+                </div>
+            </div>
+            </div>
+        )}
         </div>
     );
 }

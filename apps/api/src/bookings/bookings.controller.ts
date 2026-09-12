@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { BookingsService } from './bookings.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
+import { CreatePublicBookingDto } from './dto/create-booking.dto.js';
 
 @Controller()
 export class BookingsController {
@@ -16,14 +17,7 @@ export class BookingsController {
     }
 
     @Post('public/bookings')
-    createPublicBooking(@Body() dto: {
-        businessId: string;
-        serviceId: string;
-        staffId: string;
-        startsAt: string;
-        customerName: string;
-        customerPhone: string;
-    }) {
+    createPublicBooking(@Body() dto: CreatePublicBookingDto) {
         return this.bookingsService.createBooking(dto.businessId, { ...dto, source: 'MESSENGER' });
     }
 
@@ -41,14 +35,7 @@ export class BookingsController {
 
     @UseGuards(JwtAuthGuard)
     @Post('bookings/manual')
-    createManualBooking(@Body() dto: {
-        businessId: string;
-        serviceId: string;
-        staffId: string;
-        startsAt: string;
-        customerName: string;
-        customerPhone: string;
-    }, @Req() req: any) {
+    createManualBooking(@Body() dto: CreatePublicBookingDto, @Req() req: any) {
         return this.bookingsService.createBooking(dto.businessId, { ...dto, source: 'MANUAL' }, req.user.sub);
     }
 

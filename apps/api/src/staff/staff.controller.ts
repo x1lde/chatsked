@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { StaffService } from './staff.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
+import { CreateStaffDto } from './dto/create-staff.dto.js';
 
 @Controller()
 export class StaffController {
@@ -8,10 +9,10 @@ export class StaffController {
 
     @UseGuards(JwtAuthGuard)
     @Post('staff')
-    create(@Body() dto: { businessId: string; name: string; workingHours?: any }, @Req() req: any) {
+    create(@Body() dto: CreateStaffDto, @Req() req: any) {
         return this.staffService.create(req.user.sub, dto.businessId, {
         name: dto.name,
-        workingHours: dto.workingHours,
+        workingHours: typeof dto.workingHours === 'string' ? dto.workingHours : undefined,
         });
     }
 
