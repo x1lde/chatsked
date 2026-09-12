@@ -326,6 +326,12 @@ export default function PublicBookingPage() {
                 </div>
                 </div>
 
+                {error && (
+                    <div className="bg-red-50 text-red-600 p-3 rounded-xl text-xs font-medium border border-red-200 text-center animate-pulse">
+                        {error}
+                    </div>
+                )}
+
                 <form onSubmit={handleBook} className="glass-strong space-y-3 rounded-3xl p-5">
                 <p className="mb-1 text-sm font-semibold text-charcoal/70">5. Your details</p>
                 <input
