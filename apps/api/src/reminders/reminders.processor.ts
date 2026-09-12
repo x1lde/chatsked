@@ -2,6 +2,7 @@ import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { MessengerService } from '../webhooks/messenger.service.js';
+import { formatInBusinessTz } from '../common/business-time.js';
 
 @Processor('reminders')
 export class RemindersProcessor extends WorkerHost {
@@ -47,6 +48,7 @@ export class RemindersProcessor extends WorkerHost {
 
     private buildMessage(reminder: any) {
         const when = reminder.kind === 'H24' ? 'tomorrow' : 'in 2 hours';
-        return `Reminder: your ${reminder.booking.service.name} appointment at ${reminder.booking.business.name} is ${when}, ${reminder.booking.startsAt.toLocaleString()}.`;
+        const localTime = formatInBusinessTz(reminder.booking.startsAt, reminder.booking.business.timezone);
+        return `Reminder: your ${reminder.booking.service.name} appointment at ${reminder.booking.business.name} is ${when}, ${localTime}.`;
     }
 }

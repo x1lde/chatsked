@@ -9,11 +9,12 @@ export class BookingsController {
 
     @Get('public/availability')
     getAvailability(
+        @Query('businessId') businessId: string,
         @Query('serviceId') serviceId: string,
         @Query('staffId') staffId: string,
         @Query('date') date: string,
     ) {
-        return this.bookingsService.getAvailableSlots(serviceId, staffId, date);
+        return this.bookingsService.getAvailableSlots(businessId, serviceId, staffId, date);
     }
 
     @Post('public/bookings')

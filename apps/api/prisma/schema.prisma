@@ -51,6 +51,7 @@ model Business {
   name             String
   slug             String    @unique
   location         String?
+  timezone         String    @default("Asia/Manila")
   operatingHours   Json?     // e.g. { "mon": ["09:00","18:00"], ... }
   fbPageId         String?
   fbPageAccessToken String?  // store encrypted in production, see Phase 6 note
@@ -111,8 +112,8 @@ model Booking {
   staff       Staff         @relation(fields: [staffId], references: [id])
   customerId  String
   customer    Customer      @relation(fields: [customerId], references: [id])
-  startsAt    DateTime
-  endsAt      DateTime
+  startsAt    DateTime      @db.Timestamptz(3)
+  endsAt      DateTime      @db.Timestamptz(3)
   status      BookingStatus @default(CONFIRMED)
   source      BookingSource
   createdAt   DateTime      @default(now())

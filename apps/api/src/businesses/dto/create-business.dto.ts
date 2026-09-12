@@ -1,4 +1,4 @@
-import { IsString, MinLength, MaxLength, IsOptional } from 'class-validator';
+import { IsString, MinLength, MaxLength, IsOptional, IsTimeZone } from 'class-validator';
 
 export class CreateBusinessDto {
     @IsString()
@@ -10,4 +10,8 @@ export class CreateBusinessDto {
     @IsString()
     @MaxLength(200)
     location?: string;
+
+    @IsOptional()
+    @IsTimeZone({ message: 'timezone must be a valid IANA timezone name, e.g. Asia/Manila' })
+    timezone?: string;
 }

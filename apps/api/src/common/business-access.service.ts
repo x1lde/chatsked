@@ -1,5 +1,6 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service.js';
+import { ForbiddenException, Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service.js';    
+import { DEFAULT_BUSINESS_TIMEZONE } from './business-time.js';
 
 /**
  * Central place for tenant-ownership checks.
@@ -68,5 +69,46 @@ export class BusinessAccessService {
         if (!booking) throw new NotFoundException('Booking not found');
         await this.assertOwnsBusiness(ownerId, booking.businessId);
         return booking.businessId;
+    }
+
+        async getBusinessTimezone(businessId: string): Promise<string> {
+        const business = await this.prisma.business.findUnique({
+            where: { id: businessId },
+            select: { timezone: true },
+        });
+        if (!business) throw new NotFoundException('Business not found');
+        return business.timezone ?? DEFAULT_BUSINESS_TIMEZONE;
+    }
+
+    /**
+     * Anti-IDOR check for booking creation/availability: serviceId/staffId are
+     * always client-supplied, and owning `businessId` says nothing about which
+     * business *they* belong to. Scopes both lookups by businessId directly so
+     * a mismatch surfaces as "not found" like a nonexistent id would.
+     */
+    async assertServiceAndStaffBelongToBusiness(
+        businessId: string,
+        serviceId: string,
+        staffId: string,
+    ): Promise<{ service: { id: string; durationMin: number; price: unknown }; staffId: string }> {
+        const [service, staff] = await Promise.all([
+            this.prisma.service.findFirst({
+                where: { id: serviceId, businessId },
+                select: { id: true, durationMin: true, price: true },
+            }),
+            this.prisma.staff.findFirst({
+                where: { id: staffId, businessId },
+                select: { id: true },
+            }),
+        ]);
+        if (!service) throw new NotFoundException('Service not found for this business');
+        if (!staff) throw new NotFoundException('Staff member not found for this business');
+        return { service, staffId: staff.id };
+    }
+
+    assertBusinessIdProvided(businessId: unknown): asserts businessId is string {
+        if (typeof businessId !== 'string' || businessId.length === 0) {
+            throw new BadRequestException('businessId is required');
+        }
     }
 }
