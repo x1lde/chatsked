@@ -23,6 +23,7 @@ export default function DashboardHomePage() {
     const [upcomingBookings, setUpcomingBookings] = useState<Booking[]>([]);
     const [needsBusiness, setNeedsBusiness] = useState(false);
     const [businessName, setBusinessName] = useState('');
+    const [businessLocation, setBusinessLocation] = useState('');
     const [loading, setLoading] = useState(true);
     const [confirmingCancel, setConfirmingCancel] = useState<string | null>(null);
 
@@ -65,7 +66,7 @@ export default function DashboardHomePage() {
         try {
         const biz = await apiFetch('/businesses', {
             method: 'POST',
-            body: JSON.stringify({ name: businessName }),
+            body: JSON.stringify({ name: businessName, location: businessLocation || undefined }),
         });
         setBusiness(biz);
         setNeedsBusiness(false);
@@ -105,6 +106,13 @@ export default function DashboardHomePage() {
                 onChange={(e) => setBusinessName(e.target.value)}
                 className="glass w-full rounded-xl px-3 py-2 outline-none"
                 required
+            />
+            <input
+                type="text"
+                placeholder="Location (e.g. Quezon City)"
+                value={businessLocation}
+                onChange={(e) => setBusinessLocation(e.target.value)}
+                className="glass w-full rounded-xl px-3 py-2 outline-none"
             />
             <button type="submit" className="w-full rounded-xl bg-terracotta py-2 font-semibold text-white hover:bg-terracotta-dark">
                 Create

@@ -12,7 +12,7 @@ const navItems = [
     { href: '/customers', label: 'Customers', icon: '📇' },
 ];
 
-    export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const pathname = usePathname();
 
@@ -39,10 +39,29 @@ const navItems = [
                 </Link>
             ))}
             </nav>
+
+            <Link
+            href="/settings"
+            className={`mt-auto flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition ${
+                pathname === '/settings' ? 'bg-terracotta text-white' : 'text-charcoal/70 hover:bg-charcoal/5'
+            }`}
+            >
+            <span>⚙️</span>
+            Settings
+            </Link>
         </aside>
 
         <div className="glass sticky top-0 z-40 flex items-center justify-between px-4 py-3 lg:hidden">
             <span className="font-bold">ChatSked</span>
+            <Link
+            href="/settings"
+            className={`flex h-8 w-8 items-center justify-center rounded-full text-lg ${
+                pathname === '/settings' ? 'bg-terracotta text-white' : 'text-charcoal/70 hover:bg-charcoal/5'
+            }`}
+            aria-label="Settings"
+            >
+            ⚙️
+            </Link>
         </div>
 
         <main className="px-4 py-6 pb-24 sm:px-6 lg:ml-56 lg:px-8 lg:pb-8">{children}</main>

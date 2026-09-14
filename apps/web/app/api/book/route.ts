@@ -24,5 +24,6 @@ export async function POST(req: NextRequest) {
     });
 
     const data = await apiRes.json().catch(() => null);
+    console.log('[DEBUG] Nest responded', apiRes.status, JSON.stringify(data)); // temp
     return NextResponse.json(data, { status: apiRes.status });
 }

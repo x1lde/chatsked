@@ -68,20 +68,20 @@ export default function PublicBookingPage() {
     }, [slug]);
 
     useEffect(() => {
-        if (!selectedService || !selectedStaff || !selectedDay) return;
+        if (!selectedService || !selectedStaff || !selectedDay || !business) return;
         async function loadSlots() {
         setLoadingSlots(true);
         try {
             const dateStr = toLocalIsoDate(selectedDay!);
-            const url = `${API_URL}/public/availability?serviceId=${selectedService!.id}&staffId=${selectedStaff!.id}&date=${dateStr}`;
-            const data = await fetch(url).then((r) => r.json());
-            setSlots(data);
+            const url = `${API_URL}/public/availability?businessId=${business!.id}&serviceId=${selectedService!.id}&staffId=${selectedStaff!.id}&date=${dateStr}`;
+            const res = await fetch(url);
+            setSlots(res.ok ? await res.json() : []);
         } finally {
             setLoadingSlots(false);
         }
         }
         loadSlots();
-    }, [selectedService, selectedStaff, selectedDay]);
+    }, [selectedService, selectedStaff, selectedDay, business]);
 
     function handleSelectService(s: Service) {
         setSelectedService(s);
@@ -112,11 +112,11 @@ export default function PublicBookingPage() {
     }
 
     async function refreshSlots() {
-        if (!selectedService || !selectedStaff || !selectedDay) return;
+        if (!selectedService || !selectedStaff || !selectedDay || !business) return;
         const dateStr = toLocalIsoDate(selectedDay);
-        const url = `${API_URL}/public/availability?serviceId=${selectedService.id}&staffId=${selectedStaff.id}&date=${dateStr}`;
-        const data = await fetch(url).then((r) => r.json());
-        setSlots(data);
+        const url = `${API_URL}/public/availability?businessId=${business.id}&serviceId=${selectedService.id}&staffId=${selectedStaff.id}&date=${dateStr}`;
+        const res = await fetch(url);
+        setSlots(res.ok ? await res.json() : []);
     }
 
     async function handleBook(e: React.SubmitEvent<HTMLFormElement>) {
@@ -182,10 +182,18 @@ export default function PublicBookingPage() {
     ];
 
     return (
-        <div className="min-h-screen bg-cream p-4">
-        <div className="mx-auto max-w-sm space-y-4">
+        <div className="min-h-screen bg-cream px-4 py-8">
+        <div className="mx-auto max-w-sm space-y-6">
+            <div className="glass-strong rounded-3xl p-5 text-center">
+            <h1 className="text-xl font-bold">{business.name}</h1>
+            {business.location && <p className="text-sm text-charcoal/50">{business.location}</p>}
+            </div>
 
-            <div className="mb-2 flex items-center justify-between px-1">
+            {error && (
+            <div className="rounded-xl bg-amber/20 px-4 py-3 text-sm font-medium text-amber">{error}</div>
+            )}
+
+            <div className="glass flex items-center justify-between rounded-2xl px-4 py-3">
             {steps.map((s, i) => (
                 <div key={s.label} className="flex flex-1 flex-col items-center">
                 <div className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
@@ -325,12 +333,6 @@ export default function PublicBookingPage() {
                     <p className="mt-1 flex justify-between border-t border-charcoal/10 pt-1"><span className="text-charcoal/50">Total</span><span className="font-bold text-terracotta">₱{selectedService?.price}</span></p>
                 </div>
                 </div>
-
-                {error && (
-                    <div className="bg-red-50 text-red-600 p-3 rounded-xl text-xs font-medium border border-red-200 text-center animate-pulse">
-                        {error}
-                    </div>
-                )}
 
                 <form onSubmit={handleBook} className="glass-strong space-y-3 rounded-3xl p-5">
                 <p className="mb-1 text-sm font-semibold text-charcoal/70">5. Your details</p>

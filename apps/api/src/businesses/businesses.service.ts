@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { DEFAULT_BUSINESS_TIMEZONE } from '../common/business-time.js';
 
@@ -46,5 +46,21 @@ export class BusinessesService {
     /** Public — no auth. Must never return ownerId or fbPageAccessToken. */
     findBySlug(slug: string) {
         return this.prisma.business.findUniqueOrThrow({ where: { slug }, select: PUBLIC_SAFE_SELECT });
+    }
+
+    async update(ownerId: string, businessId: string, data: { name?: string; location?: string; timezone?: string }) {
+        const business = await this.prisma.business.findUnique({ where: { id: businessId }, select: { ownerId: true } });
+        if (!business) throw new NotFoundException('Business not found');
+        if (business.ownerId !== ownerId) throw new ForbiddenException('You do not have access to this business');
+
+        return this.prisma.business.update({
+            where: { id: businessId },
+            data: {
+                ...(data.name !== undefined ? { name: data.name } : {}),
+                ...(data.location !== undefined ? { location: data.location } : {}),
+                ...(data.timezone !== undefined ? { timezone: data.timezone } : {}),
+            },
+            select: OWNER_SAFE_SELECT,
+        });
     }
 }
